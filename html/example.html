@@ -1,0 +1,924 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>toPPT-1.7c:</title><meta name="generator" content="MATLAB 8.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-10-03"><meta name="DC.source" content="example.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>toPPT-1.8:</h1><!--introduction--><div><ul><li>Author :  Jens Richter</li><li>eMail  :  <a href="mailto:jrichter@iph.rwth-aachen.de">jrichter@iph.rwth-aachen.de</a></li><li>Date   :  November 2014</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Short description of toPPT:</a></li><li><a href="#2">Acknowledgment:</a></li><li><a href="#3">To make toPPT work:</a></li><li><a href="#4">Examples - Introduction:</a></li><li><a href="#5">Example 1 - Adding a figure:</a></li><li><a href="#6">Example 2 - Setting a title:</a></li><li><a href="#7">Example 3a - Adding a figure at a certain position:</a></li><li><a href="#8">Example 3b - Adding a text with a bullet point:</a></li><li><a href="#9">Example 4a - Adding a text with a bullet point to a new slide:</a></li><li><a href="#10">Example 4b - Adding multiple texts with a bullet points to a new slide:</a></li><li><a href="#11">Example 4c - Applying bold, underlined and italic to text elements (css-tags):</a></li><li><a href="#12">Example 4d - Changing the color, size and font of text elements (css-tags):</a></li><li><a href="#13">Example 4e - Changing the color, size and font and apply bold, underlined and italic to text elements:</a></li><li><a href="#14">Example 4f -  Using Hex-Code for defining the color of a text element:</a></li><li><a href="#15">Example 4 <img src="example_eq08165.png" alt="$\eta$"> -  Using TeX in texts:</a></li><li><a href="#16">Example 4 <img src="example_eq41477.png" alt="$\gamma$"> -  Using TeX and css-tags in texts at the same time:</a></li><li><a href="#17">Example 4 <img src="example_eq26509.png" alt="$\phi$"> - Using TeX in texts together with matlab build in texlabel-function:</a></li><li><a href="#18">Example 3c - Updating an existing slide identified by its title:</a></li><li><a href="#19">Example 3d - Inserting content after an existing slide identified by its title:</a></li><li><a href="#20">Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides):</a></li><li><a href="#21">Example 3f - Updating an existing slide identified by its slide number:</a></li><li><a href="#22">Example 5 - Adding Tables:</a></li><li><a href="#23">Example 6 - Deactivating toPPT temporally:</a></li><li><a href="#24">Example 7 - Changing the height and width of a figure:</a></li><li><a href="#25">Example 8a  - Changing the padding/gap of the active placing area of the slide:</a></li><li><a href="#26">Example 8b - Change the 'dividing' of the slide:</a></li><li><a href="#27">Example 9 - Change the resolution of the figure for exporting:</a></li><li><a href="#28">Example 10 - Export figure as vector graphic:</a></li><li><a href="#29">Example 11 - Applying a template to the active presentation:</a></li><li><a href="#30">Example 12 - Saving a presentation:</a></li><li><a href="#31">Example 13 - Closing a presentation:</a></li><li><a href="#32">Valid Parmeters for toPPT:</a></li><li><a href="#33">toPPT accepts the following predefined colors:</a></li><li><a href="#34">toPPT accepts the following predefined TeX parameters:</a></li></ul></div><h2>Short description of toPPT:<a name="1"></a></h2><p><b>toPPT</b> is a powerful tool for generating PowerPoint  presentations programmatically defined in matlab. It will use different scripts to perform exports of figures, tables and texts. For this purpose it will use scripts written by <i>Jens Richter</i> and in addition scripts written by others <b>(see Acknowledgment)</b> .</p><h2>Acknowledgment:<a name="2"></a></h2><div><ol><li><b>export_fig-script</b> by Oliver Woodford <a href="http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig">http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig</a> =&gt; Is used to generate pictures (png) from the desired figures.</li><li><b>pptfigure.m</b> by Dmitriy Aronov <a href="http://www.mathworks.com/matlabcentral/fileexchange/30124-smart-powerpoint">http://www.mathworks.com/matlabcentral/fileexchange/30124-smart-powerpoint</a>  -exporter/content/pptfigure.m =&gt; Is used for generating editable figures. An extracted part of it is used as tex2ppt converter.</li><li><b>RGB triple of color name</b>, Version 2 by Kristjan Jonasson <a href="http://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name--version-2">http://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name--version-2</a>  =&gt; Is used to transform color names to hex values.</li><li><b>Edit Distance Algorithm</b> by  Reza Ahmadzadeh <a href="http://www.mathworks.com/matlabcentral/fileexchange/39049-edit-distance-algorithm">http://www.mathworks.com/matlabcentral/fileexchange/39049-edit-distance-algorithm</a> =&gt; Is used to calculate the edit distance for placing a new slide near an other slide with a certain title.</li></ol></div><h2>To make toPPT work:<a name="3"></a></h2><p>Simply add toPPT and all subdirectories and folders to your matlab path. Example.m will do this automatically for you. The path has to be writable and readable because toPPT has to temporally save data. For a detailed help simply use <b>'help toPPT'</b>.</p><h2>Examples - Introduction:<a name="4"></a></h2><p>With some examples we will learn how toPPT works - In addition we will use a little subscript <i>example_helper.m</i> to create dummy figures.</p><h2>Example 1 - Adding a figure:<a name="5"></a></h2><p>The challenge is to place an image in png format centred in your presentation. For this example PowerPoint is already closed or open. The program will automatically use an open presentation for adding content. If PowerPoint is closed it will open it and create a blank presentation.</p><pre class="codeinput">figure1 = example_helper(1); <span class="comment">%Gets a figure</span>
+
+toPPT(figure1); <span class="comment">% By default a new slide is created when adding a figure</span>
+</pre><h2>Example 2 - Setting a title:<a name="6"></a></h2><p>We want to add a title to the slide of Example 1.</p><pre class="codeinput">toPPT(<span class="string">'setTitle'</span>,<span class="string">'My first figure with toPPT-beta1, Example 1-2'</span>);
+</pre><h2>Example 3a - Adding a figure at a certain position:<a name="7"></a></h2><p>We want to add an image in png format to the upper right half <i>(NorthEastHalf)</i> of the presentation and one image to the lower half <i>(SouthEastHalf)</i> of the image. For detailed information use <b>'help getPosParameters'</b>.</p><pre class="codeinput">figure1 = example_helper(1);
+figure2 = example_helper(2);
+
+toPPT(figure1,<span class="string">'pos'</span>,<span class="string">'NEH'</span>); <span class="comment">% NEH = NorthEastHalf</span>
+toPPT(figure2,<span class="string">'pos'</span>,<span class="string">'SEH'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'current'</span>); <span class="comment">% NEH = SouthEastHalf</span>
+
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 3a - Adding a figure at a certain position'</span>);
+</pre><h2>Example 3b - Adding a text with a bullet point:<a name="8"></a></h2><p>We want to set a title and add a text as a bullet point. <b>By default text is added centred to the current slide as a bullet point</b> (Refers to the comment <i>'SlideNumber','current'</i>). <b>Remember: By default figures are added to a new slide</b> (Refers to the comment <i>'SlideNumber','append'</i>).</p><pre class="codeinput">toPPT(<span class="string">'My first bullet item'</span>,<span class="string">'pos'</span>,<span class="string">'W'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>); <span class="comment">% We want to add it to the W = West</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 3b - Adding a text with a bullet point'</span>);
+</pre><h2>Example 4a - Adding a text with a bullet point to a new slide:<a name="9"></a></h2><p>We want to add a list of texts with bullet points to a <b>NEW</b> slide. <b>It is important to put the list into an cellaray {}.</b></p><pre class="codeinput">toPPT({<span class="string">'Text1'</span>,<span class="string">'Text2'</span>,<span class="string">'Text3'</span>},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4a - Adding a text with a bullet point to a new slide'</span>);
+</pre><h2>Example 4b - Adding multiple texts with a bullet points to a new slide:<a name="10"></a></h2><p>We add a list of texts in the <i>East</i> (new slide) with numbers instead of bullet points.</p><pre class="codeinput">toPPT({<span class="string">'Text1'</span>,<span class="string">'Text2'</span>,<span class="string">'Text3'</span>},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>,<span class="string">'setBulletNumbers'</span>,1,<span class="string">'pos'</span>,<span class="string">'W'</span>);
+toPPT({<span class="string">'Text1'</span>,<span class="string">'Text2'</span>,<span class="string">'Text3'</span>},<span class="string">'setBullets'</span>,0,<span class="string">'pos'</span>,<span class="string">'E'</span>); <span class="comment">% E = East</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4b - Adding multiple texts with a bullet points to a new slide'</span>);
+</pre><h2>Example 4c - Applying bold, underlined and italic to text elements (css-tags):<a name="11"></a></h2><p>We want to make some parts of our texts underlined, italic or/and bold.</p><pre class="codeinput">toPPT({<span class="string">'&lt;b&gt;Bold&lt;/b&gt;'</span>,<span class="string">'&lt;b&gt;&lt;u&gt;Bold and underlined&lt;/u&gt;&lt;/b&gt; meets &lt;i&gt;Italic&lt;/i&gt;'</span>,<span class="string">'Normal'</span>},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4c - Applying bold, underlined and italic to text elements (css-tags)'</span>);
+</pre><h2>Example 4d - Changing the color, size and font of text elements (css-tags):<a name="12"></a></h2><p>We want to assign another color, different size and a different font to our texts. Have a look on <i><b>'toPPT accepts the following predefined colors'</b></i> in this example-file for a list of all known colors.</p><pre class="codeinput">toPPT({<span class="string">'&lt;s color:red&gt;Red text,&lt;/s&gt; Black text, &lt;s color:blue&gt;Blue text&lt;/s&gt;'</span>,<span class="string">'&lt;s font-family:Times New Roman&gt;Using Times New Roman&lt;/s&gt;'</span>,<span class="string">'&lt;s font-size:40&gt;BIG&lt;/s&gt;'</span>},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4d - Changing the color, size and font of text elements (css-tags)'</span>);
+</pre><h2>Example 4e - Changing the color, size and font and apply bold, underlined and italic to text elements:<a name="13"></a></h2><p>Now we want to combine different tags (<a href="s">s</a>,&lt;u&gt;...) together.</p><pre class="codeinput">toPPT({<span class="string">'&lt;s color:green; font-size:36; font-family:Aharoni&gt;Mixed One&lt;/s&gt;'</span>,<span class="string">'&lt;i&gt;&lt;u&gt;&lt;b&gt;&lt;s font-family:Times New Roman&gt;Bold, underlined,italic and Times&lt;/s&gt;&lt;/b&gt;&lt;/u&gt;&lt;/i&gt;'</span>},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4e - Changing color, size and font and apply bold, underlined and italic'</span>);
+</pre><h2>Example 4f -  Using Hex-Code for defining the color of a text element:<a name="14"></a></h2><p>Now we want to use hex colors - <b>it is important to use a leading '#' in front of the hexcolor.</b> The syntax for the tag <b>s</b> (s means style) is adapted from the css language. It is absolutely necessary that each argument within the <b>s</b>-tag is closed via ";" (for the last argument the <tt>&gt;</tt> works as closing ";")</p><pre class="codeinput">toPPT(<span class="string">'&lt;s color:#5F9EA0; font-size:22; font-family:Aharoni&gt;CadetBlue&lt;/s&gt; meets &lt;s color:#FFA07A; font-size:22; font-family:Aharoni&gt;LightSalmon&lt;/s&gt;'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4f -  Using Hex-Code for defining the color of a text element'</span>);
+</pre><h2>Example 4 <img src="example_eq08165.png" alt="$\eta$"> -  Using TeX in texts:<a name="15"></a></h2><p>Now we want to show how the TeX interpreter works. In general the TeX interpreter is turned on by default. Example 12 <i><b>Saving a presentation</b></i> shows that it is sometimes necessary to turn off the interpreter. An overview of all possible TeX characters can be found in <i><b>"toPPT accepts the following predefined TeX parameters"</b></i> in this example-file. In general <i>TeX</i> can be combined with all other css-tags.</p><pre class="codeinput">toPPT({<span class="string">'Lets start with something easy x = \sqrt\x^2'</span>,<span class="string">'I like red formulas &lt;s color:red&gt;x = \sqrt\x^2&lt;\s&gt;'</span>, <span class="string">'And big blue ones &lt;i&gt;&lt;b&gt;&lt;s color:blue; font-size:40; font-family:Times New Roman&gt;x = \sqrt\x^2&lt;\s&gt;&lt;/b&gt;&lt;/i&gt;'</span>},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4 \eta -  Using TeX in texts'</span>);
+</pre><h2>Example 4 <img src="example_eq41477.png" alt="$\gamma$"> -  Using TeX and css-tags in texts at the same time:<a name="16"></a></h2><p>It is also possible to use the TeX tag \color By default the css tags (s etc.) have priority in combination with <i>TeX</i> tags.</p><pre class="codeinput">toPPT(<span class="string">'Colored formula with Tex: \color{red}a^2+b^2 = c^2'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'TeX color is overwritten by "normal" tag: &lt;s color:blue&gt;\color{red}a^2+b^2 = c^2&lt;/s&gt;'</span>,<span class="string">'pos'</span>,<span class="string">'E'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4 \gamma -  Using TeX and css-tags in texts at the same time'</span>);
+</pre><h2>Example 4 <img src="example_eq26509.png" alt="$\phi$"> - Using TeX in texts together with matlab build in texlabel-function:<a name="17"></a></h2><p>We also want to do some more complicated stuff, sometimes we are to lazy to write the <i>TeX</i>-code so we can use the inbuild matlab function <i>texlabel</i>.</p><pre class="codeinput">myTexText = texlabel(<span class="string">'lambda12^(3/2)/pi - pi*delta^(2/3)'</span>);
+
+toPPT(myTexText,<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT([<span class="string">'&lt;s color:orange&gt;'</span>,texlabel(<span class="string">'H(x)*psi(x)=E*psi(x)'</span>),<span class="string">'&lt;\s&gt;'</span>],<span class="string">'pos'</span>,<span class="string">'NEH'</span>);
+toPPT({<span class="string">'TeX Interpreter is off:'</span>,[<span class="string">'&lt;s color:blue&gt;'</span>,texlabel(<span class="string">'H(x)*psi(x)=E*psi(x)'</span>),<span class="string">'&lt;\s&gt;'</span>]},<span class="string">'pos'</span>,<span class="string">'SWH'</span>,<span class="string">'TeX'</span>,0); <span class="comment">% TeX interpreter turned off</span>
+
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 4 \phi - Using TeX in texts together with matlab build in texlabel-function'</span>);
+</pre><h2>Example 3c - Updating an existing slide identified by its title:<a name="18"></a></h2><p>The parameter <i>SlideNumber</i> can be used differently:</p><div><ul><li>A slide can be found by its title.</li><li>Even if the spelling is slightly wrong the slide can be found via edit distances.</li></ul></div><pre class="codeinput">toPPT(<span class="string">'New updated Text on Slide of Example 3a'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'Example 3a - Adding a figure at a certain position'</span>,<span class="string">'pos'</span>,<span class="string">'SWH'</span>); <span class="comment">% Found by its title.</span>
+toPPT(<span class="string">'New updated Text on Slide of Example 3a without right spelling of title'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'Axample 3a - bddinaag a figure at a cerdastain positiddd5on'</span>,<span class="string">'pos'</span>,<span class="string">'SW'</span>); <span class="comment">% Found by its title with wrong spelling.</span>
+</pre><h2>Example 3d - Inserting content after an existing slide identified by its title:<a name="19"></a></h2><p>The parameter <i>SlideAddMethod</i> can be used to insert content after an existing slide instead of updating the slide. <b>By default slides are updated.</b></p><pre class="codeinput">toPPT(<span class="string">'New inserted Text after Slide of Example 3a'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'Axample 3a - bddinaag a figure at a cerdastain positiddd5on'</span>,<span class="string">'SlideAddMethod'</span>,<span class="string">'insert'</span>,<span class="string">'pos'</span>,<span class="string">'NW'</span>); <span class="comment">% Inserting content after choosen slide</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 3d - Inserting content after an existing slide identified by its title'</span>);
+</pre><h2>Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides):<a name="20"></a></h2><pre class="codeinput">toPPT(<span class="string">'New inserted Text after slide Number 4'</span>,<span class="string">'SlideNumber'</span>,4,<span class="string">'SlideAddMethod'</span>,<span class="string">'insert'</span>,<span class="string">'pos'</span>,<span class="string">'NW'</span>); <span class="comment">% New slide will becomse slide 4</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides)'</span>);
+</pre><h2>Example 3f - Updating an existing slide identified by its slide number:<a name="21"></a></h2><pre class="codeinput">toPPT(<span class="string">'New updated Text in slide Number 4'</span>,<span class="string">'SlideNumber'</span>,4,<span class="string">'pos'</span>,<span class="string">'SW'</span>); <span class="comment">% Adds a new textbox to slide 4.</span>
+</pre><h2>Example 5 - Adding Tables:<a name="22"></a></h2><p>We want to create a new slide and add a centred table to this slide. In addition we want to add two smaller tables on another slide positioned in the West and East.</p><div><ul><li>All content for the table is put into cell arrays <b>(One cell for the captions and one cell/matrix etc. for the content)</b>. It doesn't matter if the content-cell has numeric and string values at the same time. toPPT will automatically detects if it has to <i>rotate</i> the content to fit the number of caption entries.</li></ul></div><div><ul><li>In general setTable accepts different arguments as Input:</li></ul></div><div><ol><li><b>A two dimensional cell</b> that fully defines the desired cell <b>NOT</b> including the captions. (5a)</li><li><b>Row or column vectors.</b> toPPT will automatically detect if it is a row or column vector by checking the number of caption entries. It is <b>NOT</b> possible to add row and column vectors at the same time. (5b)</li><li><b>A numeric matrix.</b> (5c)</li></ol></div><p>The syntax is: <b>toPPT('setTable',{stringCellTableCaption, matrix/Vector/cell})</b></p><pre class="codeinput">helpTableCell      = cell(2,3);
+helpTableCell{1,1} = <span class="string">'Me is first'</span>;
+helpTableCell{1,2} = <span class="string">'Me is second'</span>;
+helpTableCell{1,3} = <span class="string">'Me is third'</span>;
+helpTableCell{2,1} = <span class="string">'Me is fourth'</span>;
+helpTableCell{2,2} = <span class="string">'Me is fifth'</span>;
+helpTableCell{2,3} = <span class="string">'Me is sixth'</span>;
+
+<span class="comment">% First slide -  It is important to add "helpTableCell" into an extra cell {}</span>
+toPPT(<span class="string">'setTable'</span>,{{<span class="string">'Caption1'</span>,<span class="string">'Caption2'</span>,<span class="string">'Caption3'</span>},{helpTableCell}},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 5a - Adding tables using cell of strings'</span>);
+
+<span class="comment">% Second slide - auto rotate will be used</span>
+toPPT(<span class="string">'setTable'</span>,{{<span class="string">'Caption1'</span>,<span class="string">'Caption2'</span>},{helpTableCell}},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 5a - Adding tables using auto rotate'</span>);
+
+<span class="comment">% Third slide - It is important to add all vectors into an extra cell {}</span>
+helperVector1 = [1,2,3];
+helperVector2 = {<span class="string">'Me is 1'</span>,<span class="string">'Me is 2'</span>,<span class="string">'Me is 3'</span>};
+
+toPPT(<span class="string">'setTable'</span>,{{<span class="string">'Col 1'</span>,<span class="string">'Col 2'</span>},{helperVector1,helperVector2}},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>,<span class="string">'pos'</span>,<span class="string">'E'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 5b - Adding tables using vectors and cells mixed'</span>);
+
+<span class="comment">% With autorotation</span>
+toPPT(<span class="string">'setTable'</span>,{{<span class="string">'Col 1'</span>,<span class="string">'Col 2'</span>,<span class="string">'Col 3'</span>},{helperVector1,helperVector2}},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>,<span class="string">'pos'</span>,<span class="string">'E'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 5b - Adding tables using auto rotate with vectors'</span>);
+
+<span class="comment">% Fourth slide</span>
+toPPT(<span class="string">'setTable'</span>,{{<span class="string">'Col 1'</span>,<span class="string">'Col 2'</span>},ones(2,2)},<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>,<span class="string">'pos'</span>,<span class="string">'E'</span>);
+toPPT(<span class="string">'setTable'</span>,{{<span class="string">'Col 1'</span>,<span class="string">'Col 2'</span>},ones(3,2)},<span class="string">'pos'</span>,<span class="string">'W'</span>,<span class="string">'Width'</span>,200,<span class="string">'Height'</span>,150);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 5c - Adding tables using a matrix'</span>);
+</pre><h2>Example 6 - Deactivating toPPT temporally:<a name="23"></a></h2><p>Maybe we don't want to add something to the presentation all the time because we are just testing our script...</p><pre class="codeinput">figure1 = example_helper(1);
+
+doPublishing = 0;
+toPPT(figure1,<span class="string">'pub'</span>,doPublishing); <span class="comment">% Nothing happens</span>
+
+doPublishing = 1;
+toPPT(figure1,<span class="string">'pub'</span>,doPublishing); <span class="comment">% Now we publish</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 6 - Deactivating toPPT temporally and reactivating'</span>);
+</pre><h2>Example 7 - Changing the height and width of a figure:<a name="24"></a></h2><p>We want to add an image to the middle tile of the slide and stretch it to 100% of the width. We also want to add another image and stretch it to 200px in height which will be placed in the <i>Middle East</i>.</p><pre class="codeinput">figure1 = example_helper(1);
+
+toPPT(figure1,<span class="string">'pos'</span>,<span class="string">'M'</span>,<span class="string">'Width%'</span>,100,<span class="string">'Height%'</span>,100);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 7'</span>);
+
+toPPT(figure1,<span class="string">'pos'</span>,<span class="string">'ME'</span>,<span class="string">'Height'</span>,200,<span class="string">'Width'</span>,100); <span class="comment">% ME = MiddelEast</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 7 - Changing the height and width of a figure'</span>);
+</pre><h2>Example 8a  - Changing the padding/gap of the active placing area of the slide:<a name="25"></a></h2><p>We want to change the default gap between our centred tile in the North and in the West/East.</p><pre class="codeinput">figure1 = example_helper(1);
+
+toPPT(figure1,<span class="string">'gapN'</span>,200,<span class="string">'gapWE'</span>,150);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 8a  - Changing the padding/gap of the active placing area of the slide'</span>);
+</pre><h2>Example 8b - Change the 'dividing' of the slide:<a name="26"></a></h2><p>We want to change the divide property of the tiles - by default each image is stretched to 100% of the tile height by keeping the aspect ratio. For more information see <b>'help toPPT'</b>.</p><pre class="codeinput">figure1 = example_helper(1);
+figure2 = example_helper(2);
+
+toPPT(figure1,<span class="string">'pos'</span>,<span class="string">'E'</span>,<span class="string">'Width%'</span>,100,<span class="string">'divide'</span>,30);
+toPPT(figure2,<span class="string">'pos'</span>,<span class="string">'W'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'current'</span>,<span class="string">'Width%'</span>,100,<span class="string">'divide'</span>,30);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 8b - Change the dividing of the slide'</span>);
+</pre><h2>Example 9 - Change the resolution of the figure for exporting:<a name="27"></a></h2><p>We want to <b>increase</b> (for publications etc.)/ <b>decrease</b> (smaller file size, faster) the resolution of the png image that is used for exporting a figure.</p><pre class="codeinput">figure1 = example_helper(1);
+
+toPPT(figure1,<span class="string">'m'</span>,3); <span class="comment">% Higher value, default is m = 2</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 9 - Change the resolution of the figure for exporting (high resolution)'</span>);
+
+toPPT(figure1,<span class="string">'m'</span>,1); <span class="comment">% Lower value, default is m = 2</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 9 - Change the resolution of the figure for exporting (low resolution)'</span>);
+</pre><h2>Example 10 - Export figure as vector graphic:<a name="28"></a></h2><p>We want to export our image as vector graphic. This process is quite challenging. For huge figures with a lot of points it is not recommended to use this function. <b>In case the export fails toPPT will use the default png export as a fall back solution anyway.</b></p><pre class="codeinput">figure1 = example_helper(2);
+toPPT(figure1,<span class="string">'format'</span>,<span class="string">'vec'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 10 - Export figure as vector graphic'</span>);
+</pre><h2>Example 11 - Applying a template to the active presentation:<a name="29"></a></h2><p>Now we want to apply a template to our presentation. <b>The template file path has to be absolute</b>.</p><pre class="codeinput">templatePath = [pwd,<span class="string">'\IPH Slides_EN.potx'</span>]; <span class="comment">% The template path has to be absolute!</span>
+toPPT(<span class="string">'applyTemplate'</span>,templatePath);
+
+toPPT(<span class="string">'We applied a template!'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 11 - Applying a template to the active presentation'</span>);
+</pre><h2>Example 12 - Saving a presentation:<a name="30"></a></h2><p>Now we want to save our presentation There are three ways of saving</p><p><i>Case 1:</i> We only supply the <i><b>savePath</b></i> as argument</p><pre>   =&gt; Presentation will be saved in path as 'The Current Date and Time
+   _new_presentation.pptx'.</pre><p><i>Case 2:</i> We only supply the <i><b>saveFilename</b></i> as argument</p><pre>   =&gt; Presentation will be saved in pwd with the desired filename.</pre><p><i>Case 3:</i> We supply <i><b>savePath</b></i> and <i><b>saveFilename</b></i> as argument</p><pre>   =&gt; Presentation will be saved in savePath with the desired filename.</pre><p><b>The savepath has to be absolute.</b></p><pre class="codeinput">savePath = pwd;
+saveFilename = <span class="string">'My first presentation with toPPT'</span>;
+
+toPPT(<span class="string">'savePath'</span>,savePath,<span class="string">'saveFilename'</span>,saveFilename);
+toPPT([<span class="string">'We saved our presentation to: '</span>,savePath,<span class="string">'/'</span>,saveFilename],<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>,<span class="string">'TeX'</span>,0); <span class="comment">% Because we want to "show" a filename we should turn of TeX otherwise all "\" will be gone etc.</span>
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 12 - Saving a presentation'</span>);
+</pre><h2>Example 13 - Closing a presentation:<a name="31"></a></h2><p>We can close a presentation with toPPT - this can be helpful if we want to create multiple different presentations and close them after we saved them. Because we do not want to close the presentation in this example we just explain it on an extra slide.</p><pre class="codeinput">toPPT(<span class="string">'Closing a presentation is done via the syntax &lt;b&gt;toPPT(''close'',1)&lt;/b&gt;'</span>,<span class="string">'SlideNumber'</span>,<span class="string">'append'</span>);
+toPPT(<span class="string">'setTitle'</span>,<span class="string">'Example 13 - Closing a presentation'</span>);
+
+<span class="comment">% Done with the example.</span>
+clear;
+close <span class="string">all</span>;
+</pre><h2>Valid Parmeters for toPPT:<a name="32"></a></h2><p><b>For a detailed help simply use 'help toPPT'</b></p><h2>toPPT accepts the following predefined colors:<a name="33"></a></h2><pre>   %White colors
+   'FF','FF','FF', 'White'
+   'FF','FA','FA', 'Snow'
+   'F0','FF','F0', 'Honeydew'
+   'F5','FF','FA', 'MintCream'
+   'F0','FF','FF', 'Azure'
+   'F0','F8','FF', 'AliceBlue'
+   'F8','F8','FF', 'GhostWhite'
+   'F5','F5','F5', 'WhiteSmoke'
+   'FF','F5','EE', 'Seashell'
+   'F5','F5','DC', 'Beige'
+   'FD','F5','E6', 'OldLace'
+   'FF','FA','F0', 'FloralWhite'
+   'FF','FF','F0', 'Ivory'
+   'FA','EB','D7', 'AntiqueWhite'
+   'FA','F0','E6', 'Linen'
+   'FF','F0','F5', 'LavenderBlush'
+   'FF','E4','E1', 'MistyRose'
+   %Grey colors'
+   '80','80','80', 'Gray'
+   'DC','DC','DC', 'Gainsboro'
+   'D3','D3','D3', 'LightGray'
+   'C0','C0','C0', 'Silver'
+   'A9','A9','A9', 'DarkGray'
+   '69','69','69', 'DimGray'
+   '77','88','99', 'LightSlateGray'
+   '70','80','90', 'SlateGray'
+   '2F','4F','4F', 'DarkSlateGray'
+   '00','00','00', 'Black'
+   %Red colors
+   'FF','00','00', 'Red'
+   'FF','A0','7A', 'LightSalmon'
+   'FA','80','72', 'Salmon'
+   'E9','96','7A', 'DarkSalmon'
+   'F0','80','80', 'LightCoral'
+   'CD','5C','5C', 'IndianRed'
+   'DC','14','3C', 'Crimson'
+   'B2','22','22', 'FireBrick'
+   '8B','00','00', 'DarkRed'
+   %Pink colors
+   'FF','C0','CB', 'Pink'
+   'FF','B6','C1', 'LightPink'
+   'FF','69','B4', 'HotPink'
+   'FF','14','93', 'DeepPink'
+   'DB','70','93', 'PaleVioletRed'
+   'C7','15','85', 'MediumVioletRed'
+   %Orange colors
+   'FF','A5','00', 'Orange'
+   'FF','8C','00', 'DarkOrange'
+   'FF','7F','50', 'Coral'
+   'FF','63','47', 'Tomato'
+   'FF','45','00', 'OrangeRed'
+   %Yellow colors
+   'FF','FF','00', 'Yellow'
+   'FF','FF','E0', 'LightYellow'
+   'FF','FA','CD', 'LemonChiffon'
+   'FA','FA','D2', 'LightGoldenrodYellow'
+   'FF','EF','D5', 'PapayaWhip'
+   'FF','E4','B5', 'Moccasin'
+   'FF','DA','B9', 'PeachPuff'
+   'EE','E8','AA', 'PaleGoldenrod'
+   'F0','E6','8C', 'Khaki'
+   'BD','B7','6B', 'DarkKhaki'
+   'FF','D7','00', 'Gold'
+   %Brown colors
+   'A5','2A','2A', 'Brown'
+   'FF','F8','DC', 'Cornsilk'
+   'FF','EB','CD', 'BlanchedAlmond'
+   'FF','E4','C4', 'Bisque'
+   'FF','DE','AD', 'NavajoWhite'
+   'F5','DE','B3', 'Wheat'
+   'DE','B8','87', 'BurlyWood'
+   'D2','B4','8C', 'Tan'
+   'BC','8F','8F', 'RosyBrown'
+   'F4','A4','60', 'SandyBrown'
+   'DA','A5','20', 'Goldenrod'
+   'B8','86','0B', 'DarkGoldenrod'
+   'CD','85','3F', 'Peru'
+   'D2','69','1E', 'Chocolate'
+   '8B','45','13', 'SaddleBrown'
+   'A0','52','2D', 'Sienna'
+   '80','00','00', 'Maroon'
+   %Green colors
+   '00','80','00', 'Green'
+   '98','FB','98', 'PaleGreen'
+   '90','EE','90', 'LightGreen'
+   '9A','CD','32', 'YellowGreen'
+   'AD','FF','2F', 'GreenYellow'
+   '7F','FF','00', 'Chartreuse'
+   '7C','FC','00', 'LawnGreen'
+   '00','FF','00', 'Lime'
+   '32','CD','32', 'LimeGreen'
+   '00','FA','9A', 'MediumSpringGreen'
+   '00','FF','7F', 'SpringGreen'
+   '66','CD','AA', 'MediumAquamarine'
+   '7F','FF','D4', 'Aquamarine'
+   '20','B2','AA', 'LightSeaGreen'
+   '3C','B3','71', 'MediumSeaGreen'
+   '2E','8B','57', 'SeaGreen'
+   '8F','BC','8F', 'DarkSeaGreen'
+   '22','8B','22', 'ForestGreen'
+   '00','64','00', 'DarkGreen'
+   '6B','8E','23', 'OliveDrab'
+   '80','80','00', 'Olive'
+   '55','6B','2F', 'DarkOliveGreen'
+   '00','80','80', 'Teal'
+   %Blue colors
+   '00','00','FF', 'Blue'
+   'AD','D8','E6', 'LightBlue'
+   'B0','E0','E6', 'PowderBlue'
+   'AF','EE','EE', 'PaleTurquoise'
+   '40','E0','D0', 'Turquoise'
+   '48','D1','CC', 'MediumTurquoise'
+   '00','CE','D1', 'DarkTurquoise'
+   'E0','FF','FF', 'LightCyan'
+   '00','FF','FF', 'Cyan'
+   '00','FF','FF', 'Aqua'
+   '00','8B','8B', 'DarkCyan'
+   '5F','9E','A0', 'CadetBlue'
+   'B0','C4','DE', 'LightSteelBlue'
+   '46','82','B4', 'SteelBlue'
+   '87','CE','FA', 'LightSkyBlue'
+   '87','CE','EB', 'SkyBlue'
+   '00','BF','FF', 'DeepSkyBlue'
+   '1E','90','FF', 'DodgerBlue'
+   '64','95','ED', 'CornflowerBlue'
+   '41','69','E1', 'RoyalBlue'
+   '00','00','CD', 'MediumBlue'
+   '00','00','8B', 'DarkBlue'
+   '00','00','80', 'Navy'
+   '19','19','70', 'MidnightBlue'
+   %Purple colors
+   '80','00','80', 'Purple'
+   'E6','E6','FA', 'Lavender'
+   'D8','BF','D8', 'Thistle'
+   'DD','A0','DD', 'Plum'
+   'EE','82','EE', 'Violet'
+   'DA','70','D6', 'Orchid'
+   'FF','00','FF', 'Fuchsia'
+   'FF','00','FF', 'Magenta'
+   'BA','55','D3', 'MediumOrchid'
+   '93','70','DB', 'MediumPurple'
+   '99','66','CC', 'Amethyst'
+   '8A','2B','E2', 'BlueViolet'
+   '94','00','D3', 'DarkViolet'
+   '99','32','CC', 'DarkOrchid'
+   '8B','00','8B', 'DarkMagenta'
+   '6A','5A','CD', 'SlateBlue'
+   '48','3D','8B', 'DarkSlateBlue'
+   '7B','68','EE', 'MediumSlateBlue'
+   '4B','00','82', 'Indigo'
+   %Gray repeated with spelling grey
+   '80','80','80', 'Grey'
+   'D3','D3','D3', 'LightGrey'
+   'A9','A9','A9', 'DarkGrey'
+   '69','69','69', 'DimGrey'
+   '77','88','99', 'LightSlateGrey'
+   '70','80','90', 'SlateGrey'
+   '2F','4F','4F', 'DarkSlateGrey'</pre><h2>toPPT accepts the following predefined TeX parameters:<a name="34"></a></h2><pre>   'alpha','upsilon','sim','beta','phi','leq','gamma','chi', ...
+   'infty','delta','psi','clubsuit','epsilon','omega','diamondsuit', ...
+   'zeta','Gamma','heartsuit','eta','Delta','spadesuit','theta', ...
+   'Theta','leftrightarrow','vartheta','Lambda','leftarrow','iota', ...
+   'Xi','uparrow','kappa','Pi','rightarrow','lambda','Sigma', ...
+   'downarrow','mu','Upsilon','circ','nu','Phi','pm','xi','Psi','geq', ...
+   'pi','Omega','propto','rho','forall','partial','sigma','exists', ...
+   'bullet','varsigma','ni','div','tau','cong','neq','equiv','approx', ...
+   'aleph','Im','Re','wp','otimes','oplus','oslash','cap','cup', ...
+   'supseteq','supset','subseteq','subset','int','in','o','rfloor', ...
+   'lceil','nabla','lfloor','cdot','ldots','perp','neg','prime', ...
+   'wedge','times','0','rceil','surd','mid','vee','varpi','copyright', ...
+   'langle','rangle','^','_','{','}','sqrt'</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% toPPT-1.7c:
+% * Author :  Jens Richter
+% * eMail  :  jrichter@iph.rwth-aachen.de
+% * Date   :  03 October 2014
+
+%% Short description of toPPT:
+% *toPPT* is a powerful tool for generating PowerPoint  presentations
+% programmatically defined in matlab.
+% It will use different scripts to perform exports of figures,
+% tables and texts. For this purpose it will use scripts written
+% by _Jens Richter_ and in addition scripts written by others *(see
+% Acknowledgment)* .
+
+
+%% Acknowledgment:
+% 
+% # *export_fig-script* by Oliver Woodford
+    % http://www.mathworks.com/matlabcentral/fileexchange/23629-exportfig
+    % => Is used to generate pictures (png) from the desired figures.
+% # *pptfigure.m* by Dmitriy Aronov
+    % http://www.mathworks.com/matlabcentral/fileexchange/30124-smart-powerpoint  -exporter/content/pptfigure.m
+    % => Is used for generating editable figures. An extracted part of it
+    % is used as tex2ppt converter.
+% # *RGB triple of color name*, Version 2 by Kristjan Jonasson
+    % http://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-nameREPLACE_WITH_DASH_DASHversion-2
+    %  => Is used to transform color names to hex values.   
+% # *Edit Distance Algorithm* by  Reza Ahmadzadeh
+    % http://www.mathworks.com/matlabcentral/fileexchange/39049-edit-distance-algorithm
+    % => Is used to calculate the edit distance for placing a new slide near
+    % an other slide with a certain title.
+    
+%% To make toPPT work:
+% Simply add toPPT and all subdirectories and folders to your matlab path.
+% Example.m will do this automatically for you. 
+% The path has to be writable and readable because toPPT has to
+% temporally save data.
+% For a detailed help simply use *'help toPPT'*.
+
+
+    
+%% Examples - Introduction:
+% With some examples we will learn how toPPT works - In addition
+% we will use a little subscript _example_helper.m_ to create dummy figures.
+
+
+%% Example 1 - Adding a figure:
+% The challenge is to place an image in png format centred in your
+% presentation.
+% For this example PowerPoint is already closed or open. The program will automatically use an open presentation for adding
+% content. If PowerPoint is closed it will open it and create a blank presentation.
+ 
+figure1 = example_helper(1); %Gets a figure
+
+toPPT(figure1); % By default a new slide is created when adding a figure
+
+%% Example 2 - Setting a title:
+% We want to add a title to the slide of Example 1.
+
+toPPT('setTitle','My first figure with toPPT-beta1, Example 1-2');
+
+
+%% Example 3a - Adding a figure at a certain position:
+% We want to add an image in png format to the upper right half _(NorthEastHalf)_ 
+% of the presentation and one image to the lower half _(SouthEastHalf)_ of the image.
+% For detailed information use *'help getPosParameters'*.
+
+figure1 = example_helper(1);
+figure2 = example_helper(2);
+
+toPPT(figure1,'pos','NEH'); % NEH = NorthEastHalf
+toPPT(figure2,'pos','SEH','SlideNumber','current'); % NEH = SouthEastHalf
+
+toPPT('setTitle','Example 3a - Adding a figure at a certain position');
+
+
+
+%% Example 3b - Adding a text with a bullet point:
+% We want to set a title and add a text as a bullet point.
+% *By default text is added centred to the current slide as a bullet point*
+% (Refers to the comment _'SlideNumber','current'_).
+% *Remember: By default figures are added to a new slide*
+% (Refers to the comment _'SlideNumber','append'_).
+
+toPPT('My first bullet item','pos','W','SlideNumber','append'); % We want to add it to the W = West
+toPPT('setTitle','Example 3b - Adding a text with a bullet point');
+
+
+%% Example 4a - Adding a text with a bullet point to a new slide:
+% We want to add a list of texts with bullet points to a *NEW* slide. 
+% *It is important to put the list into an cellaray {}.*
+
+toPPT({'Text1','Text2','Text3'},'SlideNumber','append');
+toPPT('setTitle','Example 4a - Adding a text with a bullet point to a new slide');
+
+
+%% Example 4b - Adding multiple texts with a bullet points to a new slide:
+% We add a list of texts in the _East_ (new slide) with numbers instead of
+% bullet points.
+
+toPPT({'Text1','Text2','Text3'},'SlideNumber','append','setBulletNumbers',1,'pos','W');
+toPPT({'Text1','Text2','Text3'},'setBullets',0,'pos','E'); % E = East
+toPPT('setTitle','Example 4b - Adding multiple texts with a bullet points to a new slide');
+
+%% Example 4c - Applying bold, underlined and italic to text elements (css-tags):
+% We want to make some parts of our texts underlined, italic or/and bold.
+
+toPPT({'<b>Bold</b>','<b><u>Bold and underlined</u></b> meets <i>Italic</i>','Normal'},'SlideNumber','append');
+toPPT('setTitle','Example 4c - Applying bold, underlined and italic to text elements (css-tags)');
+
+%% Example 4d - Changing the color, size and font of text elements (css-tags):
+% We want to assign another color, different size and a different font to
+% our texts.
+% Have a look on _*'toPPT accepts the following predefined colors'*_ in this example-file for a list of all known colors.
+
+toPPT({'<s color:red>Red text,</s> Black text, <s color:blue>Blue text</s>','<s font-family:Times New Roman>Using Times New Roman</s>','<s font-size:40>BIG</s>'},'SlideNumber','append');
+toPPT('setTitle','Example 4d - Changing the color, size and font of text elements (css-tags)');
+
+%% Example 4e - Changing the color, size and font and apply bold, underlined and italic to text elements:
+% Now we want to combine different tags (<s>,<u>...) together.
+
+toPPT({'<s color:green; font-size:36; font-family:Aharoni>Mixed One</s>','<i><u><b><s font-family:Times New Roman>Bold, underlined,italic and Times</s></b></u></i>'},'SlideNumber','append');
+toPPT('setTitle','Example 4e - Changing color, size and font and apply bold, underlined and italic');
+
+%% Example 4f -  Using Hex-Code for defining the color of a text element:
+% Now we want to use hex colors - *it is important to use a leading '#' in front of
+% the hexcolor.*
+% The syntax for the tag *s* (s means style) is adapted from the css
+% language. It is absolutely necessary that each argument within the *s*-tag is
+% closed via ";" (for the last argument the |>| works as closing ";")
+
+toPPT('<s color:#5F9EA0; font-size:22; font-family:Aharoni>CadetBlue</s> meets <s color:#FFA07A; font-size:22; font-family:Aharoni>LightSalmon</s>','SlideNumber','append');
+toPPT('setTitle','Example 4f -  Using Hex-Code for defining the color of a text element');
+
+
+%% Example 4 $\eta$ -  Using TeX in texts:
+% Now we want to show how the TeX interpreter works. In general the TeX
+% interpreter is turned on by default. Example 12 _*Saving a presentation*_ shows that it is sometimes
+% necessary to turn off the interpreter.
+% An overview of all possible TeX characters can be found in _*"toPPT accepts the following predefined TeX parameters"*_ in this example-file.
+% In general _TeX_ can be combined with all other css-tags.
+
+toPPT({'Lets start with something easy x = \sqrt\x^2','I like red formulas <s color:red>x = \sqrt\x^2<\s>', 'And big blue ones <i><b><s color:blue; font-size:40; font-family:Times New Roman>x = \sqrt\x^2<\s></b></i>'},'SlideNumber','append');
+toPPT('setTitle','Example 4 \eta -  Using TeX in texts');
+
+%% Example 4 $\gamma$ -  Using TeX and css-tags in texts at the same time:
+% It is also possible to use the TeX tag \color
+% By default the css tags (s etc.) have priority in combination with _TeX_
+% tags.
+
+toPPT('Colored formula with Tex: \color{red}a^2+b^2 = c^2','SlideNumber','append');
+toPPT('TeX color is overwritten by "normal" tag: <s color:blue>\color{red}a^2+b^2 = c^2</s>','pos','E');
+toPPT('setTitle','Example 4 \gamma -  Using TeX and css-tags in texts at the same time');
+
+
+%% Example 4 $\phi$ - Using TeX in texts together with matlab build in texlabel-function:
+% We also want to do some more complicated stuff, sometimes we are to
+% lazy to write the _TeX_-code so we can use the inbuild matlab function
+% _texlabel_.
+
+myTexText = texlabel('lambda12^(3/2)/pi - pi*delta^(2/3)');
+
+toPPT(myTexText,'SlideNumber','append');
+toPPT(['<s color:orange>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>'],'pos','NEH');
+toPPT({'TeX Interpreter is off:',['<s color:blue>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>']},'pos','SWH','TeX',0); % TeX interpreter turned off
+
+toPPT('setTitle','Example 4 \phi - Using TeX in texts together with matlab build in texlabel-function');
+
+%% Example 3c - Updating an existing slide identified by its title:
+% The parameter _SlideNumber_ can be used differently:
+%
+% * A slide can be found by its title.
+% * Even if the spelling is slightly wrong the slide can be found via edit distances.
+toPPT('New updated Text on Slide of Example 3a','SlideNumber','Example 3a - Adding a figure at a certain position','pos','SWH'); % Found by its title.
+toPPT('New updated Text on Slide of Example 3a without right spelling of title','SlideNumber','Axample 3a - bddinaag a figure at a cerdastain positiddd5on','pos','SW'); % Found by its title with wrong spelling.
+
+%% Example 3d - Inserting content after an existing slide identified by its title:
+%
+% The parameter _SlideAddMethod_ can be used to insert content after an
+% existing slide instead of updating the slide. *By default slides are
+% updated.*
+toPPT('New inserted Text after Slide of Example 3a','SlideNumber','Axample 3a - bddinaag a figure at a cerdastain positiddd5on','SlideAddMethod','insert','pos','NW'); % Inserting content after choosen slide
+toPPT('setTitle','Example 3d - Inserting content after an existing slide identified by its title');
+
+%% Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides):
+%
+toPPT('New inserted Text after slide Number 4','SlideNumber',4,'SlideAddMethod','insert','pos','NW'); % New slide will becomse slide 4
+toPPT('setTitle','Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides)');
+
+%% Example 3f - Updating an existing slide identified by its slide number:
+%
+toPPT('New updated Text in slide Number 4','SlideNumber',4,'pos','SW'); % Adds a new textbox to slide 4.
+
+
+
+%% Example 5 - Adding Tables:
+% We want to create a new slide and add a centred table to this slide. In
+% addition we want to add two smaller tables on another slide positioned in the West and East.
+%
+% * All content for the table is put into cell arrays *(One cell for the captions and one cell/matrix etc. for the content)*. 
+% It doesn't matter if the content-cell has numeric and string values at the same time.
+% toPPT will automatically detects if it has to _rotate_ the content to fit the number of caption entries.
+%
+% * In general setTable accepts different arguments as Input:
+%
+% # *A two dimensional cell* that fully defines the desired cell *NOT* including the
+% captions. (5a)
+% # *Row or column vectors.* 
+% toPPT will automatically detect if it is a row or column vector by checking 
+% the number of caption entries. 
+% It is *NOT* possible to add row and column vectors at the same time. (5b)
+% # *A numeric matrix.* (5c)
+%
+% The syntax is: *toPPT('setTable',{stringCellTableCaption, matrix/Vector/cell})*
+
+helpTableCell      = cell(2,3);
+helpTableCell{1,1} = 'Me is first';
+helpTableCell{1,2} = 'Me is second';
+helpTableCell{1,3} = 'Me is third';
+helpTableCell{2,1} = 'Me is fourth';
+helpTableCell{2,2} = 'Me is fifth';
+helpTableCell{2,3} = 'Me is sixth';
+
+% First slide -  It is important to add "helpTableCell" into an extra cell {}
+toPPT('setTable',{{'Caption1','Caption2','Caption3'},{helpTableCell}},'SlideNumber','append');
+toPPT('setTitle','Example 5a - Adding tables using cell of strings');
+
+% Second slide - auto rotate will be used
+toPPT('setTable',{{'Caption1','Caption2'},{helpTableCell}},'SlideNumber','append');
+toPPT('setTitle','Example 5a - Adding tables using auto rotate');
+
+% Third slide - It is important to add all vectors into an extra cell {}
+helperVector1 = [1,2,3];
+helperVector2 = {'Me is 1','Me is 2','Me is 3'};
+
+toPPT('setTable',{{'Col 1','Col 2'},{helperVector1,helperVector2}},'SlideNumber','append','pos','E');
+toPPT('setTitle','Example 5b - Adding tables using vectors and cells mixed');
+
+% With autorotation
+toPPT('setTable',{{'Col 1','Col 2','Col 3'},{helperVector1,helperVector2}},'SlideNumber','append','pos','E');
+toPPT('setTitle','Example 5b - Adding tables using auto rotate with vectors');
+
+% Fourth slide
+toPPT('setTable',{{'Col 1','Col 2'},ones(2,2)},'SlideNumber','append','pos','E');
+toPPT('setTable',{{'Col 1','Col 2'},ones(3,2)},'pos','W','Width',200,'Height',150);
+toPPT('setTitle','Example 5c - Adding tables using a matrix');
+
+
+%% Example 6 - Deactivating toPPT temporally:
+% Maybe we don't want to add something to the presentation all the time
+% because we are just testing our script...
+
+figure1 = example_helper(1);
+
+doPublishing = 0;
+toPPT(figure1,'pub',doPublishing); % Nothing happens
+
+doPublishing = 1;
+toPPT(figure1,'pub',doPublishing); % Now we publish
+toPPT('setTitle','Example 6 - Deactivating toPPT temporally and reactivating');
+
+%% Example 7 - Changing the height and width of a figure:
+% We want to add an image to the middle tile of the slide and stretch it to 100% of the
+% width.
+% We also want to add another image and stretch it to 200px in height
+% which will be placed in the _Middle East_.
+
+figure1 = example_helper(1);
+
+toPPT(figure1,'pos','M','Width%',100,'Height%',100);
+toPPT('setTitle','Example 7');
+
+toPPT(figure1,'pos','ME','Height',200,'Width',100); % ME = MiddelEast
+toPPT('setTitle','Example 7 - Changing the height and width of a figure');
+
+%% Example 8a  - Changing the padding/gap of the active placing area of the slide:
+% We want to change the default gap between our centred tile in the North and in 
+% the West/East. 
+
+figure1 = example_helper(1);
+
+toPPT(figure1,'gapN',200,'gapWE',150);
+toPPT('setTitle','Example 8a  - Changing the padding/gap of the active placing area of the slide');
+
+%% Example 8b - Change the 'dividing' of the slide:
+% We want to change the divide property of the tiles - by default each
+% image is stretched to 100% of the tile height by keeping the aspect
+% ratio. For more information see *'help toPPT'*.
+
+figure1 = example_helper(1);
+figure2 = example_helper(2);
+
+toPPT(figure1,'pos','E','Width%',100,'divide',30);
+toPPT(figure2,'pos','W','SlideNumber','current','Width%',100,'divide',30);
+toPPT('setTitle','Example 8b - Change the dividing of the slide');
+
+%% Example 9 - Change the resolution of the figure for exporting:
+% We want to *increase* (for publications etc.)/ *decrease* (smaller file size, faster)
+% the resolution of the png image that is used for exporting a figure.
+
+figure1 = example_helper(1);
+
+toPPT(figure1,'m',3); % Higher value, default is m = 2
+toPPT('setTitle','Example 9 - Change the resolution of the figure for exporting (high resolution)');
+
+toPPT(figure1,'m',1); % Lower value, default is m = 2
+toPPT('setTitle','Example 9 - Change the resolution of the figure for exporting (low resolution)');
+
+%% Example 10 - Export figure as vector graphic:
+% We want to export our image as vector graphic. This process is quite
+% challenging. For huge figures with a lot of points it is not recommended
+% to use this function. *In case the export fails toPPT will use the default
+% png export as a fall back solution anyway.*
+
+figure1 = example_helper(2);
+toPPT(figure1,'format','vec');
+toPPT('setTitle','Example 10 - Export figure as vector graphic');
+
+
+%% Example 11 - Applying a template to the active presentation:
+% Now we want to apply a template to our presentation. *The template file
+% path has to be absolute*.
+
+templatePath = [pwd,'\IPH Slides_EN.potx']; % The template path has to be absolute!
+toPPT('applyTemplate',templatePath);
+
+toPPT('We applied a template!','SlideNumber','append');
+toPPT('setTitle','Example 11 - Applying a template to the active presentation');
+
+%% Example 12 - Saving a presentation:
+% Now we want to save our presentation
+% There are three ways of saving
+%
+% _Case 1:_ We only supply the _*savePath*_ as argument
+%
+%     => Presentation will be saved in path as 'The Current Date and Time
+%     _new_presentation.pptx'.
+%
+% _Case 2:_ We only supply the _*saveFilename*_ as argument
+%
+%     => Presentation will be saved in pwd with the desired filename.
+%
+% _Case 3:_ We supply _*savePath*_ and _*saveFilename*_ as argument
+%
+%     => Presentation will be saved in savePath with the desired filename.
+%
+% *The savepath has to be absolute.*
+
+savePath = pwd;
+saveFilename = 'My first presentation with toPPT';
+
+toPPT('savePath',savePath,'saveFilename',saveFilename);
+toPPT(['We saved our presentation to: ',savePath,'/',saveFilename],'SlideNumber','append','TeX',0); % Because we want to "show" a filename we should turn of TeX otherwise all "\" will be gone etc.
+toPPT('setTitle','Example 12 - Saving a presentation');
+
+%% Example 13 - Closing a presentation:
+% We can close a presentation with toPPT - this can be helpful if we want
+% to create multiple different presentations and close them after we saved 
+% them. Because we do not want to close the presentation in this example we
+% just explain it on an extra slide.
+
+toPPT('Closing a presentation is done via the syntax <b>toPPT(''close'',1)</b>','SlideNumber','append');
+toPPT('setTitle','Example 13 - Closing a presentation');
+
+% Done with the example.
+clear;
+close all;
+
+
+
+%% Valid Parmeters for toPPT:
+% *For a detailed help simply use 'help toPPT'*
+
+
+%% toPPT accepts the following predefined colors:
+%     %White colors
+%     'FF','FF','FF', 'White'
+%     'FF','FA','FA', 'Snow'
+%     'F0','FF','F0', 'Honeydew'
+%     'F5','FF','FA', 'MintCream'
+%     'F0','FF','FF', 'Azure'
+%     'F0','F8','FF', 'AliceBlue'
+%     'F8','F8','FF', 'GhostWhite'
+%     'F5','F5','F5', 'WhiteSmoke'
+%     'FF','F5','EE', 'Seashell'
+%     'F5','F5','DC', 'Beige'
+%     'FD','F5','E6', 'OldLace'
+%     'FF','FA','F0', 'FloralWhite'
+%     'FF','FF','F0', 'Ivory'
+%     'FA','EB','D7', 'AntiqueWhite'
+%     'FA','F0','E6', 'Linen'
+%     'FF','F0','F5', 'LavenderBlush'
+%     'FF','E4','E1', 'MistyRose'
+%     %Grey colors'
+%     '80','80','80', 'Gray'
+%     'DC','DC','DC', 'Gainsboro'
+%     'D3','D3','D3', 'LightGray'
+%     'C0','C0','C0', 'Silver'
+%     'A9','A9','A9', 'DarkGray'
+%     '69','69','69', 'DimGray'
+%     '77','88','99', 'LightSlateGray'
+%     '70','80','90', 'SlateGray'
+%     '2F','4F','4F', 'DarkSlateGray'
+%     '00','00','00', 'Black'
+%     %Red colors
+%     'FF','00','00', 'Red'
+%     'FF','A0','7A', 'LightSalmon'
+%     'FA','80','72', 'Salmon'
+%     'E9','96','7A', 'DarkSalmon'
+%     'F0','80','80', 'LightCoral'
+%     'CD','5C','5C', 'IndianRed'
+%     'DC','14','3C', 'Crimson'
+%     'B2','22','22', 'FireBrick'
+%     '8B','00','00', 'DarkRed'
+%     %Pink colors
+%     'FF','C0','CB', 'Pink'
+%     'FF','B6','C1', 'LightPink'
+%     'FF','69','B4', 'HotPink'
+%     'FF','14','93', 'DeepPink'
+%     'DB','70','93', 'PaleVioletRed'
+%     'C7','15','85', 'MediumVioletRed'
+%     %Orange colors
+%     'FF','A5','00', 'Orange'
+%     'FF','8C','00', 'DarkOrange'
+%     'FF','7F','50', 'Coral'
+%     'FF','63','47', 'Tomato'
+%     'FF','45','00', 'OrangeRed'
+%     %Yellow colors
+%     'FF','FF','00', 'Yellow'
+%     'FF','FF','E0', 'LightYellow'
+%     'FF','FA','CD', 'LemonChiffon'
+%     'FA','FA','D2', 'LightGoldenrodYellow'
+%     'FF','EF','D5', 'PapayaWhip'
+%     'FF','E4','B5', 'Moccasin'
+%     'FF','DA','B9', 'PeachPuff'
+%     'EE','E8','AA', 'PaleGoldenrod'
+%     'F0','E6','8C', 'Khaki'
+%     'BD','B7','6B', 'DarkKhaki'
+%     'FF','D7','00', 'Gold'
+%     %Brown colors
+%     'A5','2A','2A', 'Brown'
+%     'FF','F8','DC', 'Cornsilk'
+%     'FF','EB','CD', 'BlanchedAlmond'
+%     'FF','E4','C4', 'Bisque'
+%     'FF','DE','AD', 'NavajoWhite'
+%     'F5','DE','B3', 'Wheat'
+%     'DE','B8','87', 'BurlyWood'
+%     'D2','B4','8C', 'Tan'
+%     'BC','8F','8F', 'RosyBrown'
+%     'F4','A4','60', 'SandyBrown'
+%     'DA','A5','20', 'Goldenrod'
+%     'B8','86','0B', 'DarkGoldenrod'
+%     'CD','85','3F', 'Peru'
+%     'D2','69','1E', 'Chocolate'
+%     '8B','45','13', 'SaddleBrown'
+%     'A0','52','2D', 'Sienna'
+%     '80','00','00', 'Maroon'
+%     %Green colors
+%     '00','80','00', 'Green'
+%     '98','FB','98', 'PaleGreen'
+%     '90','EE','90', 'LightGreen'
+%     '9A','CD','32', 'YellowGreen'
+%     'AD','FF','2F', 'GreenYellow'
+%     '7F','FF','00', 'Chartreuse'
+%     '7C','FC','00', 'LawnGreen'
+%     '00','FF','00', 'Lime'
+%     '32','CD','32', 'LimeGreen'
+%     '00','FA','9A', 'MediumSpringGreen'
+%     '00','FF','7F', 'SpringGreen'
+%     '66','CD','AA', 'MediumAquamarine'
+%     '7F','FF','D4', 'Aquamarine'
+%     '20','B2','AA', 'LightSeaGreen'
+%     '3C','B3','71', 'MediumSeaGreen'
+%     '2E','8B','57', 'SeaGreen'
+%     '8F','BC','8F', 'DarkSeaGreen'
+%     '22','8B','22', 'ForestGreen'
+%     '00','64','00', 'DarkGreen'
+%     '6B','8E','23', 'OliveDrab'
+%     '80','80','00', 'Olive'
+%     '55','6B','2F', 'DarkOliveGreen'
+%     '00','80','80', 'Teal'
+%     %Blue colors
+%     '00','00','FF', 'Blue'
+%     'AD','D8','E6', 'LightBlue'
+%     'B0','E0','E6', 'PowderBlue'
+%     'AF','EE','EE', 'PaleTurquoise'
+%     '40','E0','D0', 'Turquoise'
+%     '48','D1','CC', 'MediumTurquoise'
+%     '00','CE','D1', 'DarkTurquoise'
+%     'E0','FF','FF', 'LightCyan'
+%     '00','FF','FF', 'Cyan'
+%     '00','FF','FF', 'Aqua'
+%     '00','8B','8B', 'DarkCyan'
+%     '5F','9E','A0', 'CadetBlue'
+%     'B0','C4','DE', 'LightSteelBlue'
+%     '46','82','B4', 'SteelBlue'
+%     '87','CE','FA', 'LightSkyBlue'
+%     '87','CE','EB', 'SkyBlue'
+%     '00','BF','FF', 'DeepSkyBlue'
+%     '1E','90','FF', 'DodgerBlue'
+%     '64','95','ED', 'CornflowerBlue'
+%     '41','69','E1', 'RoyalBlue'
+%     '00','00','CD', 'MediumBlue'
+%     '00','00','8B', 'DarkBlue'
+%     '00','00','80', 'Navy'
+%     '19','19','70', 'MidnightBlue'
+%     %Purple colors
+%     '80','00','80', 'Purple'
+%     'E6','E6','FA', 'Lavender'
+%     'D8','BF','D8', 'Thistle'
+%     'DD','A0','DD', 'Plum'
+%     'EE','82','EE', 'Violet'
+%     'DA','70','D6', 'Orchid'
+%     'FF','00','FF', 'Fuchsia'
+%     'FF','00','FF', 'Magenta'
+%     'BA','55','D3', 'MediumOrchid'
+%     '93','70','DB', 'MediumPurple'
+%     '99','66','CC', 'Amethyst'
+%     '8A','2B','E2', 'BlueViolet'
+%     '94','00','D3', 'DarkViolet'
+%     '99','32','CC', 'DarkOrchid'
+%     '8B','00','8B', 'DarkMagenta'
+%     '6A','5A','CD', 'SlateBlue'
+%     '48','3D','8B', 'DarkSlateBlue'
+%     '7B','68','EE', 'MediumSlateBlue'
+%     '4B','00','82', 'Indigo'
+%     %Gray repeated with spelling grey
+%     '80','80','80', 'Grey'
+%     'D3','D3','D3', 'LightGrey'
+%     'A9','A9','A9', 'DarkGrey'
+%     '69','69','69', 'DimGrey'
+%     '77','88','99', 'LightSlateGrey'
+%     '70','80','90', 'SlateGrey'
+%     '2F','4F','4F', 'DarkSlateGrey'
+
+
+%% toPPT accepts the following predefined TeX parameters:
+%     'alpha','upsilon','sim','beta','phi','leq','gamma','chi', ...
+%     'infty','delta','psi','clubsuit','epsilon','omega','diamondsuit', ...
+%     'zeta','Gamma','heartsuit','eta','Delta','spadesuit','theta', ...
+%     'Theta','leftrightarrow','vartheta','Lambda','leftarrow','iota', ...
+%     'Xi','uparrow','kappa','Pi','rightarrow','lambda','Sigma', ...
+%     'downarrow','mu','Upsilon','circ','nu','Phi','pm','xi','Psi','geq', ...
+%     'pi','Omega','propto','rho','forall','partial','sigma','exists', ...
+%     'bullet','varsigma','ni','div','tau','cong','neq','equiv','approx', ...
+%     'aleph','Im','Re','wp','otimes','oplus','oslash','cap','cup', ...
+%     'supseteq','supset','subseteq','subset','int','in','o','rfloor', ...
+%     'lceil','nabla','lfloor','cdot','ldots','perp','neg','prime', ...
+%     'wedge','times','0','rceil','surd','mid','vee','varpi','copyright', ...
+%     'langle','rangle','^','_','{','}','sqrt'
+
+
+
+
+##### SOURCE END #####
+--></body></html>
