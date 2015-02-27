@@ -19,7 +19,7 @@
 %   status - 0 iff command ran without problem.
 %   result - Output from ghostscript.
 
-% Copyright: Oliver Woodford, 2009-2013
+% Copyright: Oliver Woodford, 2009-2015
 
 % Thanks to Jonas Dorn for the fix for the title of the uigetdir window on
 % Mac OS.
@@ -39,17 +39,9 @@
 % Vermeer for raising the issue.
 
 function varargout = ghostscript(cmd)
-% Initialize any required system calls before calling ghostscript
-shell_cmd = '';
-if isunix
-    shell_cmd = 'export LD_LIBRARY_PATH=""; '; % Avoids an error on Linux with GS 9.07
-end
-if ismac
-    shell_cmd = 'export DYLD_LIBRARY_PATH=""; ';  % Avoids an error on Mac with GS 9.07
-end
 % Call ghostscript
-[varargout{1:nargout}] = system(sprintf('%s"%s" %s', shell_cmd, gs_path, cmd));
-return
+[varargout{1:nargout}] = system([gs_command(gs_path()) cmd]);
+end
 
 function path_ = gs_path
 % Return a valid path
@@ -132,6 +124,7 @@ while 1
     end
 end
 error('Ghostscript not found. Have you installed it from www.ghostscript.com?');
+end
 
 function good = check_store_gs_path(path_)
 % Check the path is valid
@@ -144,14 +137,24 @@ if ~user_string('ghostscript', path_)
     warning('Path to ghostscript installation could not be saved. Enter it manually in %s.', fullfile(fileparts(which('user_string.m')), '.ignore', 'ghostscript.txt'));
     return
 end
-return
+end
 
 function good = check_gs_path(path_)
 % Check the path is valid
+[good, message] = system([gs_command(path_) '-h']);
+good = good == 0;
+end
+
+function cmd = gs_command(path_)
+% Initialize any required system calls before calling ghostscript
 shell_cmd = '';
+if isunix
+    shell_cmd = 'export LD_LIBRARY_PATH=""; '; % Avoids an error on Linux with GS 9.07
+end
 if ismac
     shell_cmd = 'export DYLD_LIBRARY_PATH=""; ';  % Avoids an error on Mac with GS 9.07
 end
-[good, message] = system(sprintf('%s"%s" -h', shell_cmd, path_));
-good = good == 0;
-return
+% Construct the command string
+cmd = sprintf('%s"%s" ', shell_cmd, path_);
+end
+

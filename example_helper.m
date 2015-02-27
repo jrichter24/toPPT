@@ -25,9 +25,11 @@ switch figure_index
         x=0:0.1:2*pi;
         b=zeros(5);
         c={'one','two','three','four','five'};
-        for a=1:5
-            b(a)=plot(x,sin(a*x));
-            legend(b(1:a),c(1:a))
+        xlabel('x')
+        ylabel('y')
+        for a=1:3
+            b(a)=plot(x,sin(a*x),'Marker','+','LineWidth',2,'LineStyle',':');
+            legend(b(1:a),c(1:a),'FontSize',34,'FontName','High Tower Text')
             %pause(1)
         end
         title('My Figure for toPPT');

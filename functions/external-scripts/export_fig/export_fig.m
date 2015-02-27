@@ -12,6 +12,7 @@
 %   export_fig ... -r<val>
 %   export_fig ... -a<val>
 %   export_fig ... -q<val>
+%   export_fig ... -p<val>
 %   export_fig ... -<renderer>
 %   export_fig ... -<colorspace>
 %   export_fig ... -append
@@ -117,6 +118,9 @@
 %             default for pdf & eps. Note: lossless compression can
 %             sometimes give a smaller file size than the default lossy
 %             compression, depending on the type of images.
+%   -p<val> - option to add a border of width val to eps and pdf files,
+%             where val is in units of the intermediate eps file. Default:
+%             0 (i.e. no padding).
 %   -append - option indicating that if the file (pdfs only) already
 %             exists, the figure is to be appended as a new page, instead
 %             of being overwritten (default).
@@ -220,7 +224,10 @@ if ~cls
     Ztick = make_cell(get(Hlims, 'ZTickMode'));
 end
 % Set all axes limit and tick modes to manual, so the limits and ticks can't change
-set(Hlims, 'XLimMode', 'manual', 'YLimMode', 'manual', 'ZLimMode', 'manual', 'XTickMode', 'manual', 'YTickMode', 'manual', 'ZTickMode', 'manual');
+set(Hlims, 'XLimMode', 'manual', 'YLimMode', 'manual', 'ZLimMode', 'manual');
+set_tick_mode(Hlims, 'X');
+set_tick_mode(Hlims, 'Y');
+set_tick_mode(Hlims, 'Z');
 % Set to print exactly what is there
 set(fig, 'InvertHardcopy', 'off');
 % Set the renderer
@@ -292,7 +299,7 @@ if isbitmap(options)
         A = uint8(A);
         % Crop the background
         if options.crop
-            [alpha, v] = crop_background(alpha, 0);
+            [alpha, v] = crop_borders(alpha, 0, 1);
             A = A(v(1):v(2),v(3):v(4),:);
         end
         if options.png
@@ -339,7 +346,7 @@ if isbitmap(options)
         end
         % Crop the background
         if options.crop
-            A = crop_background(A, tcol);
+            A = crop_borders(A, tcol, 1);
         end
         % Downscale the image
         A = downsize(A, options.aa_factor);
@@ -418,7 +425,7 @@ if isvector(options)
     end
     try
         % Generate an eps
-        print2eps(tmp_nam, fig, p2eArgs{:});
+        print2eps(tmp_nam, fig, options.bb_padding, p2eArgs{:});
         % Remove the background, if desired
         if options.transparent && ~isequal(get(fig, 'Color'), 'none')
             eps_remove_background(tmp_nam, 1 + using_hg2(fig));
@@ -468,7 +475,7 @@ else
         set(Hlims(a), 'XLimMode', Xlims{a}, 'YLimMode', Ylims{a}, 'ZLimMode', Zlims{a}, 'XTickMode', Xtick{a}, 'YTickMode', Ytick{a}, 'ZTickMode', Ztick{a});
     end
 end
-return
+end
 
 function [fig, options] = parse_args(nout, varargin)
 % Parse the input arguments
@@ -489,6 +496,7 @@ options = struct('name', 'export_fig_out', ...
                  'im', nout == 1, ...
                  'alpha', nout == 2, ...
                  'aa_factor', 0, ...
+                 'bb_padding', 0, ...
                  'magnify', [], ...
                  'resolution', [], ...
                  'bookmark', false, ...
@@ -539,7 +547,7 @@ for a = 1:nargin-1
                 case 'native'
                     native = true;
                 otherwise
-                    val = str2double(regexp(varargin{a}, '(?<=-(m|M|r|R|q|Q))(\d*\.)?\d+(e-?\d+)?', 'match'));
+                    val = str2double(regexp(varargin{a}, '(?<=-(m|M|r|R|q|Q|p|P))-?\d*.?\d+', 'match'));
                     if ~isscalar(val)
                         error('option %s not recognised', varargin{a});
                     end
@@ -550,6 +558,8 @@ for a = 1:nargin-1
                             options.resolution = val;
                         case 'q'
                             options.quality = max(val, 0);
+                        case 'p'
+                            options.bb_padding = val;
                     end
             end
         else
@@ -579,7 +589,7 @@ end
 
 % Set default anti-aliasing now we know the renderer
 if options.aa_factor == 0
-    options.aa_factor = 1 + 2 * (~using_hg2(fig) | (options.renderer == 3));
+    options.aa_factor = 1 + 2 * (~(using_hg2(fig) && strcmp(get(ancestor(fig, 'figure'), 'GraphicsSmoothing'), 'on')) | (options.renderer == 3));
 end
 
 % Convert user dir '~' to full path
@@ -658,7 +668,7 @@ if native && isbitmap(options)
         break
     end
 end
-return
+end
 
 function A = downsize(A, factor)
 % Downsample an image
@@ -685,11 +695,11 @@ catch
     % Subsample
     A = A(1+floor(mod(end-1, factor)/2):factor:end,1+floor(mod(end-1, factor)/2):factor:end,:);
 end
-return
+end
 
 function A = rgb2grey(A)
 A = cast(reshape(reshape(single(A), [], 3) * single([0.299; 0.587; 0.114]), size(A, 1), size(A, 2)), class(A));
-return
+end
 
 function A = check_greyscale(A)
 % Check if the image is greyscale
@@ -698,67 +708,7 @@ if size(A, 3) == 3 && ...
         all(reshape(A(:,:,2) == A(:,:,3), [], 1))
     A = A(:,:,1); % Save only one channel for 8-bit output
 end
-return
-
-function [A, v] = crop_background(A, bcol)
-% Map the foreground pixels
-[h, w, c] = size(A);
-if isscalar(bcol) && c > 1
-    bcol = bcol(ones(1, c));
 end
-bail = false;
-for l = 1:w
-    for a = 1:c
-        if ~all(A(:,l,a) == bcol(a))
-            bail = true;
-            break;
-        end
-    end
-    if bail
-        break;
-    end
-end
-bail = false;
-for r = w:-1:l
-    for a = 1:c
-        if ~all(A(:,r,a) == bcol(a))
-            bail = true;
-            break;
-        end
-    end
-    if bail
-        break;
-    end
-end
-bail = false;
-for t = 1:h
-    for a = 1:c
-        if ~all(A(t,:,a) == bcol(a))
-            bail = true;
-            break;
-        end
-    end
-    if bail
-        break;
-    end
-end
-bail = false;
-for b = h:-1:t
-    for a = 1:c
-        if ~all(A(b,:,a) == bcol(a))
-            bail = true;
-            break;
-        end
-    end
-    if bail
-        break;
-    end
-end
-% Crop the background, leaving one boundary pixel to avoid bleeding on
-% resize
-v = [max(t-1, 1) min(b+1, h) max(l-1, 1) min(r+1, w)];
-A = A(v(1):v(2),v(3):v(4),:);
-return
 
 function eps_remove_background(fname, count)
 % Remove the background of an eps file
@@ -786,22 +736,22 @@ while count
 end
 % Close the file
 fclose(fh);
-return
+end
 
 function b = isvector(options)
 b = options.pdf || options.eps;
-return
+end
 
 function b = isbitmap(options)
 b = options.png || options.tif || options.jpg || options.bmp || options.im || options.alpha;
-return
+end
 
 % Helper function
 function A = make_cell(A)
 if ~iscell(A)
     A = {A};
 end
-return
+end
 
 function add_bookmark(fname, bookmark_text)
 % Adds a bookmark to the temporary EPS file after %%EndPageSetup
@@ -835,4 +785,15 @@ catch ex
     rethrow(ex);
 end
 fclose(fh);
-return
+end
+
+function set_tick_mode(Hlims, ax)
+% Set the tick mode of linear axes to manual
+% Leave log axes alone as these are tricky
+M = get(Hlims, [ax 'Scale']);
+if ~iscell(M)
+    M = {M};
+end
+M = cellfun(@(c) strcmp(c, 'linear'), M);
+set(Hlims(M), [ax 'TickMode'], 'manual');
+end
