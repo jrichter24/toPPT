@@ -30,17 +30,17 @@ function saveCopyProperties(sourceObj,targetObj,corrector)
                 elseif ~strcmp(exchangeProp,'') && ~strcmp(exchangeProp,'null')
                     
                     set(targetObj,exchangeProp,propStruct.(propFields{ii}));
-                    display(['Added - ',' Field: ',exchangeProp,' Value: ',propStruct.(propFields{ii})]);
+                    %display(['Added - ',' Field: ',exchangeProp,' Value: ',propStruct.(propFields{ii})]);
                     
                 else
                     
                     set(targetObj,propFields{ii},propStruct.(propFields{ii}));
-                    display(['Added - ',' Field: ',propFields{ii},' Value: ',propStruct.(propFields{ii})]);
+                    %display(['Added - ',' Field: ',propFields{ii},' Value: ',propStruct.(propFields{ii})]);
                     
                 end
                 
             catch
-                display(['Not Added - ',' Field: ',propFields{ii}]);
+                %display(['Not Added - ',' Field: ',propFields{ii}]);
             end
         end
 

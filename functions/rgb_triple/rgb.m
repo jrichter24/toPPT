@@ -433,6 +433,14 @@ switch outputFormat
         % so basically it is flipped
         rgbOut = hex2dec([rgb{3},rgb{2},rgb{1}]);
         
+    case 'decVec'
+        
+        r1 = hex2dec(rgb{1});
+        r2 = hex2dec(rgb{2});
+        r3 = hex2dec(rgb{3});
+        
+        rgbOut = [r1,r2,r3];
+        
 end
     
 end

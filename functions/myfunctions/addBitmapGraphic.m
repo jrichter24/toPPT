@@ -75,10 +75,10 @@ if strcmp(myArg.externalParameters,'')
             
 else
     try
-        export_fig(myFigure,[pwd '\pptfig.tif'],'-transparent',['-m',num2str(myArg.defaultMagnify)],myArg.arguments{1:length(myArg.arguments)});
+        export_fig(myFigure,[pwd '\pptfig.tif'],'-transparent',['-m',num2str(myArg.defaultMagnify)],myArg.externalParameters{1:length(myArg.externalParameters)});
         imageinfo = imfinfo([pwd '\pptfig.tif']);
     catch
-        export_fig(myFigure,'.\pptfig.tif','-transparent',['-m',num2str(myArg.defaultMagnify)],myArg.arguments{1:length(myArg.arguments)});
+        export_fig(myFigure,'.\pptfig.tif','-transparent',['-m',num2str(myArg.defaultMagnify)],myArg.externalParameters{1:length(myArg.externalParameters)});
         imageinfo = imfinfo('.\pptfig.tif');
     end
 

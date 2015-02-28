@@ -1,4 +1,4 @@
-% toPPT-1.7c by Jens Richter 
+% toPPT-2 by Jens Richter 
 % email: jrichter@iph.rwth-aachen.de
 %
 % The following help describes the parameters in the order they appear in
@@ -184,6 +184,89 @@
 %   format.
 %
 %
+% Parameters for QR-Code generation:
+% ---------------
+% Parameter 'QR-Size':
+% ---------------
+% Syntax:
+%   toPPT(message, 'QR-Size',[117,117]);
+%   or equally:
+%   toPPT(message, 'QR-Size',117);
+%
+% Description:
+%   Generates a QR code of the defined Size. The size has to match the
+%   17+4N rule (e.g. 17+4*25 = 117).
+%
+%
+% Parameter 'QR-Version':
+% ---------------
+% Syntax:
+%   toPPT(message, 'QR-Version',10);
+%
+% Description:
+%   Generates a QR code of the defined QR code version.
+%
+%
+% Parameter 'QR-ErrQuality':
+% ---------------
+% Syntax:
+%   toPPT(message, 'QR-ErrQuality','L');
+%
+% Description:
+%   ErrQuality accepts one of the following strings "L" or "M" or "H" or
+%   "Q".
+% Definition of error correction codes (taken from
+% http://en.wikipedia.org/wiki/QR_code):
+%   Level L (Low) 	7% of code words can be restored.
+%   Level M (Medium) 	15% of code words can be restored.
+%   Level Q (Quartile)[40] 	25% of code words can be restored.
+%   Level H (High) 	30% of code words can be restored.
+%
+%
+% Parameter 'QR-CharacterSet':
+% ---------------
+% Syntax:
+%   toPPT(message, 'QR-CharacterSet','UTF-8');
+%
+% Description:
+%   Defines the character set that will be used. See qrcode_config.m for a
+%   full list of available character sets.
+%
+%
+% Parameter 'QR-DownloadJars':
+% ---------------
+% Syntax:
+%   toPPT(someMessage,'QR-DownloadJars', 1);
+%
+% Description:
+%   This will download the necessary Jar files. So it is possible to use
+%   qrcode_gen statically instead of importing the jars from the internet.
+%
+%
+% Parameter 'QR-BgColor':
+% ---------------
+% Syntax:
+%   toPPT(someMessage,'QR-BgColor', 'red');
+%   or equally:
+%   toPPT(someMessage,'QR-BgColor', '#FF0000');
+%
+% Description:
+%   This will set the background color of the QR code. The input needs to
+%   be a string specifing a known color or a HEX code with leading #. 
+%
+%
+% Parameter 'QR-color':
+% ---------------
+% Syntax:
+%   toPPT(someMessage,'QR-color', 'blue');
+%   or equally:
+%   toPPT(someMessage,'QR-color', '#00FF00');
+%
+% Description:
+%   This will set the color of the QR code. The input needs to
+%   be a string specifing a known color or a HEX code with leading #. 
+%
+%
 % Parameter 'applyTemplate':
 % ---------------
 %   It is possible to apply a template (e.g. potx format) to the current
@@ -230,7 +313,7 @@
 function toPPT(varargin)
 
 
-%% toPPT-beta1.7c by Jens Richter 
+%% toPPT-beta2 by Jens Richter 
 % email: jrichter@iph.rwth-aachen.de
 
 %% This little script can be seen as an addon to existing scripts 
@@ -275,8 +358,176 @@ if ~isempty(structMyArgument.value)
 end
 %%%
 
+
+
+
+%%%
+
 if doPublishing %uncomment later //Todo
 %% In this section we will have to distinguish between text and figures
+
+%%% Check if we want to translate text to QR
+
+textAsQRCode = 0; % By default we do NOT want to translate text in QR-Code
+
+structMyArgument         = deleteFromArgumentAndGetValue(varargin,'TextAsQR');
+if ~isempty(structMyArgument.value)
+    textAsQRCode        = structMyArgument.value;
+    varargin            = structMyArgument.arguments;
+end
+
+if textAsQRCode
+    if strcmp(version('-release'),'2014b') || strcmp(version('-release'),'2014a')
+        % Get additional parameters
+        %%% QR code parameters %%% Parameter 'Size':Parameter 'Version':
+        %%% 'ErrQuality': 'CharacterSet': 'DownloadJars':
+        
+        qrPropertySetVector = cell(5,2);
+        qrPropertySetVector{1,1} = 'Size';
+        qrPropertySetVector{2,1} = 'Version';
+        qrPropertySetVector{3,1} = 'ErrQuality';
+        qrPropertySetVector{4,1} = 'CharacterSet';
+        qrPropertySetVector{5,1} = 'DownloadJars';
+        
+        qrPropertyVectorLogical = zeros(5,1);
+        
+        
+        % Size of QR-Code
+        myArgQR.sizeSet = 0;
+        structMyArgument            = deleteFromArgumentAndGetValue(varargin,'QR-Size');
+        if ~isempty(structMyArgument.value)
+            myArgQR.qrSize          = structMyArgument.value;
+            varargin                = structMyArgument.arguments;
+            myArgQR.sizeSet = 1;
+            qrPropertyVectorLogical(1) = 1;
+            qrPropertySetVector{1,2} = myArgQR.qrSize;
+        end
+        
+        % Version of QR-Code
+        myArgQR.versionSet = 0;
+        structMyArgument        = deleteFromArgumentAndGetValue(varargin,'QR-Version');
+        if ~isempty(structMyArgument.value)
+            myArgQR.qrVersion     = structMyArgument.value;
+            varargin           = structMyArgument.arguments;
+            myArgQR.versionSet = 1;
+            qrPropertyVectorLogical(2) = 1;
+            qrPropertySetVector{2,2} = myArgQR.qrVersion;
+        end
+        
+        % Error correction quality
+        myArgQR.errQSet = 0;
+        structMyArgument          = deleteFromArgumentAndGetValue(varargin,'QR-ErrQuality');
+        if ~isempty(structMyArgument.value)
+            myArgQR.qrErrQuality  = structMyArgument.value;
+            varargin              = structMyArgument.arguments;
+            myArgQR.errQSet = 1;
+            qrPropertyVectorLogical(3) = 1;
+            qrPropertySetVector{3,2} = myArgQR.qrErrQuality;
+        end
+        
+        % Character set for QR code
+        myArgQR.charSet = 0;
+        structMyArgument          = deleteFromArgumentAndGetValue(varargin,'QR-CharacterSet');
+        if ~isempty(structMyArgument.value)
+            myArgQR.qrCharaterSet = structMyArgument.value;
+            varargin              = structMyArgument.arguments;
+            myArgQR.charSet = 1;
+            qrPropertyVectorLogical(4) = 1;
+            qrPropertySetVector{4,2} = myArgQR.qrCharaterSet;
+        end
+        
+        % Download Jars
+        myArgQR.downJarSet     = 0;
+        structMyArgument           = deleteFromArgumentAndGetValue(varargin,'QR-DownloadJars');
+        if ~isempty(structMyArgument.value)
+            myArgQR.qrDownloadJars = structMyArgument.value;
+            varargin               = structMyArgument.arguments;
+            myArgQR.downJarSet     = 1;
+            qrPropertyVectorLogical(5) = 1;
+            qrPropertySetVector{5,2} = myArgQR.qrDownloadJars;
+        end
+        
+        % Gernerate argument list for qrCode
+        qrCodeArgumentCell = cell(sum(qrPropertyVectorLogical)*2,1);
+        
+        jj = 1;
+        
+        for ii=1:5
+            if(qrPropertyVectorLogical(ii))
+                qrCodeArgumentCell{jj} = qrPropertySetVector{ii,1};
+                qrCodeArgumentCell{jj+1} = qrPropertySetVector{ii,2};
+                jj = jj + 2;
+            end
+        end
+        
+        
+        qr = qrcode_gen(varargin{1},qrCodeArgumentCell{1:numel(qrCodeArgumentCell)});
+        
+        % Get default properties for plotting
+        toPPTQR = toPPT_conifg('toPPTQR');
+        
+        
+        % Get some plotting infos
+        structMyArgument           = deleteFromArgumentAndGetValue(varargin,'QR-Color');
+        if ~isempty(structMyArgument.value)
+            toPPTQR.color          = structMyArgument.value;
+            varargin               = structMyArgument.arguments;
+        end
+        
+        structMyArgument           = deleteFromArgumentAndGetValue(varargin,'QR-BgColor');
+        if ~isempty(structMyArgument.value)
+            toPPTQR.BGcolor        = structMyArgument.value;
+            varargin               = structMyArgument.arguments;
+        end
+        
+
+        try
+            myColormap = [rgb(toPPTQR.color,'decVec'); rgb(toPPTQR.BGcolor,'decVec')]/255;
+            
+            figureQR = figure;
+            imagesc(qr);
+            colormap(myColormap);
+            axis off;
+            axis equal;
+            
+        catch
+            
+            warning('Something went wrong when plotting the QR-Code. Do you assigned QR-Color and QR-BgColor as a string? Allowed values are hex colors like #FF0000 (with leading #) and known color names.');
+            
+            toPPTQR = toPPT_conifg('toPPTQR');
+            
+            myColormap = [rgb(toPPTQR.color,'decVec'); rgb(toPPTQR.BGcolor,'decVec')]/255;
+            
+            figureQR = figure;
+            imagesc(qr);
+            colormap(myColormap);
+            axis off;
+            axis equal;
+            
+        end
+        
+        
+        
+        
+        varargin{1} = figureQR;
+        
+%         myColormap = [0, 0, 0; 0.5,0.5,0.5];
+%         qr = qrcode_gen(message,'Size',97); % you can also specify [97,97] instead
+% 
+%         figureQR = figure;
+%         imagesc(qr);
+%         colormap(myColormap);
+%         axis off;
+%         axis equal;
+        
+    else
+        warning('You need at least version 2014a of matlab to use the QR-code feature in toPPT');
+        varargin{1} = 'You need at least version 2014a of Matlab to use the QR-code feature in toPPT.';
+    end
+    
+end
+
+
 
 pptOutputVersion    = 2; % Output 1 = editable graphic , 2 = png image (default), 3 = text
 booleanValidFigure  = 0; % Valid figure, default is no => we will check
@@ -284,65 +535,65 @@ booleanValidText    = 0; % Valid text, default is no => we will check
 error = 0;
 
 if isempty(varargin) % No argument :-(
-   %%error('Sorry you have to give me at least one argument - figure or string/cell of strings');
-   % Call the help
-   help toPPT;
-   return;
+    %%error('Sorry you have to give me at least one argument - figure or string/cell of strings');
+    % Call the help
+    help toPPT;
+    return;
 elseif ~isempty(varargin)
-   %Check first if argument is pure string or cell array of strings
-   if ischar(varargin{1}) % Just a single string?
-       pptOutputVersion = 3;
-       booleanValidText = 1;
-   elseif iscell(varargin{1}) % cell?
-       if ischar(varargin{1}{1})% string?
-           % First element in the cell is a string? 
-           % => We are not checking the other fields => will lead to an error but faster
-           pptOutputVersion = 3;
-           booleanValidText = 1;
-       elseif iscell(varargin{1}{1}) %% We have cells within cells => is the first object of this cell a string?
-           % We want to transform this to a cell with strings
-           newStringCell = cell(1,numel(varargin{1}));
-           
-           for ii=1:numel(varargin{1})
-               tempString = '';
-               if ischar(varargin{1}{ii})
-                   
-                   tempString = varargin{1}{ii};
-               
-               elseif iscell(varargin{1}{ii})
-                   
-                   
-                   for jj=1:numel(varargin{1}{ii})
-                       if ischar(varargin{1}{ii}{jj})
+    %Check first if argument is pure string or cell array of strings
+    if ischar(varargin{1}) % Just a single string?
+        pptOutputVersion = 3;
+        booleanValidText = 1;
+    elseif iscell(varargin{1}) % cell?
+        if ischar(varargin{1}{1})% string?
+            % First element in the cell is a string?
+            % => We are not checking the other fields => will lead to an error but faster
+            pptOutputVersion = 3;
+            booleanValidText = 1;
+        elseif iscell(varargin{1}{1}) %% We have cells within cells => is the first object of this cell a string?
+            % We want to transform this to a cell with strings
+            newStringCell = cell(1,numel(varargin{1}));
+            
+            for ii=1:numel(varargin{1})
+                tempString = '';
+                if ischar(varargin{1}{ii})
+                    
+                    tempString = varargin{1}{ii};
+                    
+                elseif iscell(varargin{1}{ii})
+                    
+                    
+                    for jj=1:numel(varargin{1}{ii})
+                        if ischar(varargin{1}{ii}{jj})
                             tempString = [tempString,varargin{1}{ii}{jj},' '];
-                       else
-                           % Error - not supported
-                           error = 1;
-                       end
-                   end
-                   
-                   
-               end
-               newStringCell{ii} = tempString;
-           end
-           if error == 0
-               booleanValidText = 1;
-               pptOutputVersion = 3;
-               varargin{1} = newStringCell;
-           end
-           
-       end
-       
-   else %%Probably a figure
-       try % We use try => if an error happens we just catch it
-           booleanValidFigure = strcmpi(get(varargin{1},'type'),'figure'); % Will return 1 if true, 0 if false
-       catch err
-                throwAsCaller(errorGetCause(err));
-       end    
-       if booleanValidFigure % If true lets save the figure to a new variable to distinguish between arguments texts and figure
-          myFigure = varargin{1};
-       end
-   end
+                        else
+                            % Error - not supported
+                            error = 1;
+                        end
+                    end
+                    
+                    
+                end
+                newStringCell{ii} = tempString;
+            end
+            if error == 0
+                booleanValidText = 1;
+                pptOutputVersion = 3;
+                varargin{1} = newStringCell;
+            end
+            
+        end
+        
+    else %%Probably a figure
+        try % We use try => if an error happens we just catch it
+            booleanValidFigure = strcmpi(get(varargin{1},'type'),'figure'); % Will return 1 if true, 0 if false
+        catch err
+            throwAsCaller(errorGetCause(err));
+        end
+        if booleanValidFigure % If true lets save the figure to a new variable to distinguish between arguments texts and figure
+            myFigure = varargin{1};
+        end
+    end
     
 end
 
@@ -407,47 +658,25 @@ end
 %% Now we are going to distinguish between arguments that belongs to this script or to the subscripts
 
 
-
 %%Default values - myArgumentsImage. (postioning, etc)
-if pptOutputVersion == 1 || pptOutputVersion == 2
-    %General
-    myArgumentsImage.defaultSlideNumber       = 'append';
-    myArgumentsImage.defaultSlideAddMethod    = 'update';
-    myArgumentsImage.defaultwidthPercentage   = 80; %in percent
-    myArgumentsImage.widthPercentageByUser    = 0;
-    myArgumentsImage.defaultheightPercentage  = 100; %in percent
-    myArgumentsImage.heightPercentageByUser   = 0;
-    myArgumentsImage.stringPos                = 'C';
-    myArgumentsImage.defaultWidthDivideTile   = 50; %in percent
-    myArgumentsImage.defaultOuterGapTileN     = 110; %in px
-    myArgumentsImage.defaultOuterGapTileS     = 60; %in px
-    myArgumentsImage.defaultOuterGapTileWE    = 10; %in px
-    myArgumentsImage.userHeight               = [];
-    myArgumentsImage.userLeft                 = [];
-    myArgumentsImage.userTop                  = [];
-    myArgumentsImage.userWidth                = [];
-    
-    myArgumentsImage.myPresentationHeight     = [];
-    myArgumentsImage.myPresentationWidth      = [];
-    myArgumentsImage.objectHeight             = [];
-    myArgumentsImage.objectWidth              = [];
-    
-end
 
 if pptOutputVersion == 2
-    %only for png
-    myArgumentsImagePNG                       = myArgumentsImage;
-    myArgumentsImagePNG.defaultMagnify        = 2;
+    
+    % only for png
+    
+    myArgumentsImagePNG = toPPT_conifg('toPPTFigurePNG');
     
     %%Overwrite values (if existing) with user input
     myArgumentsImagePNG = getValuesFromArgument(myArgumentsImagePNG,vararginStructure,'png');
     
+
 end
 
 if pptOutputVersion == 1
+
     %only for vector
-    myArgumentsImageVEC                       = myArgumentsImage;
-    myArgumentsImageVEC.defaultAutoGroupMin   = 30;
+
+    myArgumentsImageVEC = toPPT_conifg('toPPTFigureVEC');
     
     %%Overwrite values (if existing) with user input
     myArgumentsImageVEC = getValuesFromArgument(myArgumentsImageVEC,vararginStructure,'vec');
@@ -455,49 +684,8 @@ end
 
 if pptOutputVersion == 3
     
-    myArgumentsText.isGeneralCommand          = 0; % If we want to save a presentation isGeneralCommand will be set to 1
-    
-    %% Template
-    myArgumentsText.doApplyTemplate           = 0; % By default no template is present
-    %% Save 
-    myArgumentsText.doSavePPTPath             = 0; 
-    myArgumentsText.doSavePPTFilename         = 0;
-    myArgumentsText.doClose                   = 0;
-    
-    %% Default values - myArgumentsText (title, etc)
-    myArgumentsText.defaultSlideNumber        = 'current';
-    myArgumentsText.defaultSlideAddMethod     = 'update';
-    myArgumentsText.defaultwidthPercentage    = 100; %in percent
-    myArgumentsText.widthPercentageByUser     = 1;
-    myArgumentsText.defaultheightPercentage   = 100; %in percent
-    myArgumentsText.heightPercentageByUser    = 1;
-    myArgumentsText.stringPos                 = 'W';
-    myArgumentsText.defaultWidthDivideTile    = 50; %in percent
-    myArgumentsText.defaultOuterGapTileN      = 90; %in px
-    myArgumentsText.defaultOuterGapTileS      = 10; %in px
-    myArgumentsText.defaultOuterGapTileWE     = 10; %in px
-    myArgumentsText.defaultTitle              = 'MySlide'; %in percent
-    myArgumentsText.defaultTable              = 'MyTable';   
-    myArgumentsText.doSetTitle                = 0;
-    myArgumentsText.doSetText                 = 0;
-    myArgumentsText.doSetTable                = 0;
-    myArgumentsText.doSetTableS               = 0;
-    myArgumentsText.addBulletPoints           = 1;
-    myArgumentsText.addBulletNumbers          = 0;
-    myArgumentsText.userHeight                = [];
-    myArgumentsText.userLeft                  = [];
-    myArgumentsText.userTop                   = [];
-    myArgumentsText.userWidth                 = [];
-    myArgumentsText.doTexText                 = 1; % By default in each text attribute tex code is searched
-    
-    myArgumentsText.myPresentationHeight      = [];
-    myArgumentsText.myPresentationWidth       = [];
-    myArgumentsText.objectHeight              = [];
-    myArgumentsText.objectWidth               = [];
-    
-    myArgumentsText.doSetHyper                = 0;
-    myArgumentsText.defaultHyperlink          = 'MyHyperLink';
-    
+    myArgumentsText = toPPT_conifg('toPPTText');
+
     %%Overwrite values (if existing) with user input
     myArgumentsText = getValuesFromArgument(myArgumentsText,vararginStructure,'text');
     
@@ -533,7 +721,10 @@ switch pptOutputVersion
         try
              % to addText also gerneal behaivour is adddresed like saving
              % etc.
+             
              addText(myArgumentsText);
+             
+             
         catch myError
             display('Your command was not performed succefully!');
         end
@@ -561,7 +752,7 @@ switch exception.identifier
         causeException = MException(exception.identifier, 'Unknown error');
         exceptionCaused = addCause(exception,causeException);
 end
-    
+
 end
 
 
@@ -662,8 +853,8 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
         %%% Top %%%
         structMyArgument       = deleteFromArgumentAndGetValue(arguments,'Top');
         if ~isempty(structMyArgument.value)
-            myArg.userTop                    = structMyArgument.value;
-            arguments              = structMyArgument.arguments;
+            myArg.userTop      = structMyArgument.value;
+            arguments          = structMyArgument.arguments;
         end
         %%%
 
@@ -674,6 +865,7 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             arguments              = structMyArgument.arguments;
         end
         %%%
+
 
 
     end
@@ -893,11 +1085,11 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             arguments                  = structMyArgument.arguments;
             myArg.doSetHyper           = 1;
         end
+        
+
     end
     
 
-    
-    
     
     switch out
         case 'vec'
@@ -931,5 +1123,68 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
         myArg.externalParameters = arguments; % Text to add in addText or just remaining arguments setted by user but not needed by this script at this point => we will just forward them
     end
 
+
+end
+
+% Local functions that are not used externally
+function out = deleteFromArgumentAndGetValue(arguments,searchString)
+
+value        = [];
+
+try
+    indexSearch = findStringInStructure(arguments,searchString);
+
+catch myError
+    indexSearch = -1;
+    %Notfound => thats even better ;-)
+end
+
+if indexSearch ~= -1
+    %%%Yes the user setted slidenumber to an other value => the value is
+    %%%saved at slidenumber+1
+    
+    value = arguments{indexSearch+1}; %%Overwrite default value with user input
+        
+    %Now lets delete that value
+    arguments = deleteFromStructure(arguments,[indexSearch,indexSearch+1]);
+end
+
+out.value       = value;
+out.arguments   = arguments;
+out.indexSearch = indexSearch;
+
+end
+
+function index = findStringInStructure(mystructure,mystring)
+
+count = 0;
+index = -1;
+
+for ii=1:length(mystructure)
+    try
+    if strcmp(mystructure{ii},mystring)
+        index(count+1) = ii;
+        count = count+1;
+    end
+    catch
+        % Seems not to be a string => No problem ;-)
+    end
+end
+
+end
+
+function newstructure = deleteFromStructure(structure,arrayIndices)
+
+newstructure = '';
+
+jj = 1;
+for ii =1:length(structure)
+    
+    if isempty(find(arrayIndices==ii, 1))
+        newstructure{jj} = structure{ii};
+        jj = jj+1;
+    end
+    
+end
 
 end

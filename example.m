@@ -1,5 +1,8 @@
-clear;
-close all;
+%% toPPT-2:
+% * Author :  Jens Richter
+% * eMail  :  jrichter@iph.rwth-aachen.de
+% * Date   :  28 February 2015
+
 
 %% Adds all files of toPPT to matlab path
 fullpath = mfilename('fullpath');
@@ -11,18 +14,23 @@ cd(pathstr1);
 clear pathstr1 fullpath;
 
 
-%% toPPT-1.8:
-% * Author :  Jens Richter
-% * eMail  :  jrichter@iph.rwth-aachen.de
-% * Date   :  November 2014
+
+%% Latest release notes:
+% * toPPT works together with *Matlab 2014b* and *Office 2013*.
+% * Minor bug fixes.
+% * Added QR code ability.
+% * Major changes in pptfigure to make it work together with *Office 2013*
+% and *Matlab 2014b*
+% * Moved all default values of toPPT into *toPPT_config.m*.
+% * Updated used version of export_fig to to version published at 28 Feb 2015
 
 %% Short description of toPPT:
 % *toPPT* is a powerful tool for generating PowerPoint  presentations
 % programmatically defined in matlab.
 % It will use different scripts to perform exports of figures,
 % tables and texts. For this purpose it will use scripts written
-% by _Jens Richter_ and in addition scripts written by others *(see
-% Acknowledgment)* .
+% by myself and in addition scripts written by others *(see
+% Acknowledgment)*.
 
 
 %% Acknowledgment:
@@ -41,6 +49,9 @@ clear pathstr1 fullpath;
     % http://www.mathworks.com/matlabcentral/fileexchange/39049-edit-distance-algorithm
     % => Is used to calculate the edit distance for placing a new slide near
     % an other slide with a certain title.
+% # *QR Code Generator based on zxing* taken from another project of myself
+    % http://www.mathworks.com/matlabcentral/fileexchange/49808-qr-code-generator-based-on-zxing
+    % => Is used to create the QR-Codes (Please also check the Acknowledgment of QR-Code directly).
     
 %% To make toPPT work:
 % Simply add toPPT and all subdirectories and folders to your matlab path.
@@ -50,7 +61,6 @@ clear pathstr1 fullpath;
 % For a detailed help simply use *'help toPPT'*.
 
 
-    
 %% Examples - Introduction:
 % With some examples we will learn how toPPT works - In addition
 % we will use a little subscript _example_helper.m_ to create dummy figures.
@@ -112,7 +122,7 @@ toPPT('setTitle','Example 4a - Adding a text with a bullet point to a new slide'
 
 toPPT({'Text1','Text2','Text3'},'SlideNumber','append','setBulletNumbers',1,'pos','W');
 toPPT({'Text1','Text2','Text3'},'setBullets',0,'pos','E'); % E = East
-toPPT('setTitle','Example 4b - Adding multiple texts with a bullet points to a new slide');
+toPPT('setTitle','Example 4b - Adding multiple texts with a bullet point to a new slide');
 
 %% Example 4c - Applying bold, underlined and italic to text elements (css-tags):
 % We want to make some parts of our texts underlined, italic or/and bold.
@@ -302,8 +312,8 @@ toPPT('setTitle','Example 8a  - Changing the padding/gap of the active placing a
 figure1 = example_helper(1);
 figure2 = example_helper(2);
 
-toPPT(figure1,'pos','E','Width%',100,'divide',30);
-toPPT(figure2,'pos','W','SlideNumber','current','Width%',100,'divide',30);
+toPPT(figure1,'pos','E','Width%',60,'divide',30);
+toPPT(figure2,'pos','W','SlideNumber','current','Width%',60,'divide',30);
 toPPT('setTitle','Example 8b - Change the dividing of the slide');
 
 %% Example 9 - Change the resolution of the figure for exporting:
@@ -329,7 +339,63 @@ toPPT(figure1,'format','vec');
 toPPT('setTitle','Example 10 - Export figure as vector graphic');
 
 
-%% Example 11 - Applying a template to the active presentation:
+%% Example 11 - Specify parameters for export_fig directly via toPPT:
+% toPPT makes strong use of *'export_fig'*. Maybe in some situations it is
+% necessary to supply parameters for export_fig directly. For this reason
+% all commands that are not recognized be toPPT are directly forwarded as
+% input to export_fig. Please refer to *help export_fig*. For some commands
+% export_fig needs to have Ghostscript installed.
+%
+% In this example we change the colorspace to CMYK and gray for the same
+% figure before exporting to powerpoint.
+
+figure1 = example_helper(1);
+
+toPPT(figure1,'pos','W','-CMYK'); % colorspace CMYK
+toPPT(figure1,'pos','E','SlideNumber','current','-gray'); % colorspace gray
+toPPT('setTitle','Example 11 - Change the colorspace (specify parameters for exportfig directly via toPPT)');
+
+
+%% Example 12a - QR-Code with test message 'Hello world':
+% *Annotation:* QR-Code generation is only available for *Matlab2014a* and
+% later. The QR-Code generation is based on *zxings* java libraries. 
+% For this purpose toPPT will import all
+% necessary  jar files on the fly from a maven repository server (check
+% *qrcode_config.m* for details). In addition QRcode_gen has an option to 
+% download the necessary jar files and save them into a predefined directory. 
+% If you are not willing to download precompiled jars from the web 
+% (what is understandable in terms of security issues) you can access
+% zxings open source project (http://github.com/zxing) check the source code
+% and compile the jars yourself. For a list of all available parameters call *help toPPT*. 
+%
+% We want to simply add a QR-Code with a test message.
+
+message = 'This is a hello world test message';
+toPPT(message,'TextAsQR',1);
+toPPT('setTitle','Example 12a - QR-Code with test message "Hello world"');
+
+%% Example 12b - Adding MECard as QR Code
+% We want to add an QR code to the left corner at the bottom. The QR code
+% in this example is representing a MECARD. In addition we want to change
+% the background and QR-Code color.
+
+message = 'MECARD:N:Skywalker,Luke;ADR:76 9th Avenue, 4th Floor, New York, NY 10011;TEL:1234567891011;EMAIL:luke@skywalker.com;;';
+
+toPPT(message,'TextAsQR',1,'QR-Version',40,'pos','SW','Left',5,'gapS',15,'QR-Color','#00549F','QR-BgColor','#D5FFFF');
+toPPT(['<s color:#00549F; font-size:22; font-family:Aharoni>Thank you for your attention.',char(13),'Please scan the QR Code for Luke Skywalkers contact information.</s> '],'pos','ME','setBullets',0);
+toPPT('setTitle','Example 12b - Adding MECard as QR Code');
+
+
+%% Example 12c - Downloading the necessary jars from the internet:
+% This will just add the necessary syntax for downloading the jars. We will
+% not do that at this point so you can decide on your own if you want to
+% download them.
+
+toPPT('Downloading jars for QR-Code generator is done by <b>toPPT(someStringMessage,''QR-DownloadJars'',1)</b>','SlideNumber','append');
+toPPT('setTitle','Example 12c - Syntax for downloading the necessary jars from the internet');
+
+
+%% Example 13 - Applying a template to the active presentation:
 % Now we want to apply a template to our presentation. *The template file
 % path has to be absolute*.
 
@@ -337,9 +403,9 @@ templatePath = [pwd,'\IPH Slides_EN.potx']; % The template path has to be absolu
 toPPT('applyTemplate',templatePath);
 
 toPPT('We applied a template!','SlideNumber','append');
-toPPT('setTitle','Example 11 - Applying a template to the active presentation');
+toPPT('setTitle','Example 13 - Applying a template to the active presentation');
 
-%% Example 12 - Saving a presentation:
+%% Example 14 - Saving a presentation:
 % Now we want to save our presentation
 % There are three ways of saving
 %
@@ -363,21 +429,19 @@ saveFilename = 'My first presentation with toPPT';
 
 toPPT('savePath',savePath,'saveFilename',saveFilename);
 toPPT(['We saved our presentation to: ',savePath,'/',saveFilename],'SlideNumber','append','TeX',0); % Because we want to "show" a filename we should turn of TeX otherwise all "\" will be gone etc.
-toPPT('setTitle','Example 12 - Saving a presentation');
+toPPT('setTitle','Example 14 - Saving a presentation');
 
-%% Example 13 - Closing a presentation:
+%% Example 15 - Closing a presentation:
 % We can close a presentation with toPPT - this can be helpful if we want
 % to create multiple different presentations and close them after we saved 
 % them. Because we do not want to close the presentation in this example we
 % just explain it on an extra slide.
 
 toPPT('Closing a presentation is done via the syntax <b>toPPT(''close'',1)</b>','SlideNumber','append');
-toPPT('setTitle','Example 13 - Closing a presentation');
+toPPT('setTitle','Example 15 - Closing a presentation');
 
-% Done with the example.
-clear;
+%% Done with the example. Lets close all generated figures.
 close all;
-
 
 
 %% Valid Parmeters for toPPT:

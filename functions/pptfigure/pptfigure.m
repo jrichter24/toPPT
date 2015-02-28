@@ -271,17 +271,21 @@ if strcmp(version('-release'),'2014b')
         corrector = {};
         saveCopyProperties(legends(1),dummyLegendAxes,corrector);
         dummyLegendAxes.XTick = -1;
+        dummyLegendAxes.XLim = [0 1];
         dummyLegendAxes.YTick = -1;
         dummyLegendAxes.Tag = 'legend';
         dummyLegendAxes.ZTick = [-1 0 1];
         dummyLegendAxes.ActivePositionProperty = 'position';
-        % Make axes slighlty wider
+        
+        % dummyLegendAxes.Color = [1 0 0];
+        
+        % Make axes slighlty wider and shift it
         curPosition = dummyLegendAxes.Position;
         dummyLegendAxes.Position = [curPosition(1),curPosition(2),curPosition(3)*1.2,curPosition(4)];
-        %dummyLegendAxes.Box = 'on';
+        dummyLegendAxes.Box = 'on';
     end
     
-    calledIndex = 0;
+%     calledIndex = 0;
     
     for ii=1:numel(legends)
         
@@ -289,7 +293,7 @@ if strcmp(version('-release'),'2014b')
             
             curText = text(0,0,'','Parent',dummyLegendAxes);
             
-            saveCopyProperties(legends(ii),curText,{'TextColor','Color','Tag',''});
+            saveCopyProperties(legends(ii),curText,{'TextColor','Color';'Tag',''});
             curLegendPos = legends(ii).Position;
             
             % Calculate y position
@@ -306,8 +310,10 @@ if strcmp(version('-release'),'2014b')
 
 
             % Calculate x position
-            xPos = 0.0929/curLegendPos(3);
+            xPos     = 0.0929/curLegendPos(3);
             
+            %xPosLine = [0.0143/curLegendPos(3) 0.0858/curLegendPos(3)];
+            xPosLine = [0.0143/curLegendPos(3), 0.0859/curLegendPos(3)];
             
             set(curText,'String',legends(ii).String{jj});
             
@@ -316,8 +322,8 @@ if strcmp(version('-release'),'2014b')
             set(curText,'Position',[xPos,yPos,0]);
             curText.EdgeColor = 'none';
             
-            display(['calledlegend: ',num2str(calledIndex)]);
-            calledIndex = calledIndex+1;
+%             display(['calledlegend: ',num2str(calledIndex)]);
+%             calledIndex = calledIndex+1;
             
             % Add a line indicating which line belongs to which legend entry
             % First we have to find the matching line object that has the
@@ -325,14 +331,22 @@ if strcmp(version('-release'),'2014b')
             curLineHandle = findall(axesListTemp,'DisplayName',legends(ii).String{jj});
             
             legendLine = line(0,0,0,'Parent',dummyLegendAxes);
-            saveCopyProperties(curLineHandle,legendLine,{});
-%             set(legendLine,'XData',[xPos]);
-%             set(legendLine,'YData',[yPos]);
-%             set(legendLine,'ZData',[]);
-            set(legendLine,'XData',[0.0879121 0.527473]);
-            set(legendLine,'YData',[0.188995 0.188995]);
+            saveCopyProperties(curLineHandle,legendLine,{'Parent','';'Tag','';'XData','';'YData','';'ZData','';'XDataSource',''});
+
+            % pos1 0.0143
+            % pos2 0.0858
+            
+            xPosLinestart  = xPosLine(1);
+            %xPosLineEnd = (xPosLine(2)-xPosLine(1))/2;
+            xPosLineEnd = xPosLine(2);
+            %xPosInBetween = (xPosLineEnd-xPosLinestart)/2;
+            
+            
+            set(legendLine,'XData',[xPosLinestart xPosLineEnd]);
+            set(legendLine,'YData',[yPos yPos]);
             set(legendLine,'ZData',[]);
-            set(legendLine,'Tag',legends(ii).String{jj});
+            legendLine.AlignVertexCenters = 'off';
+            
             
         end
         
@@ -1224,7 +1238,7 @@ for obj = length(objects):-1:1
         if ~(strcmp(type,'text') && isempty(deblank(txtString))) && ...
                 isempty(find(legendObjects==objects(obj),1))            
             % Copy and paste the figure
-            display(type);
+            %display(type);
             set(H,'PaperPositionMode','manual','Renderer','painters')
             print('-dmeta',['-f' num2strH], ...
                 ['-r' num2str(prop.metaResolution)]) %#ok<MCPRT>
