@@ -400,6 +400,7 @@ toPPT('setTitle','Example 12c - Syntax for downloading the necessary jars from t
 % path has to be absolute*.
 
 templatePath = [pwd,'\IPH Slides_EN.potx']; % The template path has to be absolute!
+%templatePath = [pwd,'\testtemplate.potx']; % The template path has to be absolute!
 toPPT('applyTemplate',templatePath);
 
 toPPT('We applied a template!','SlideNumber','append');

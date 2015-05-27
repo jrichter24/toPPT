@@ -349,6 +349,34 @@ function toPPT(varargin)
 doPublishing = 1; %default is yes = 1
 
 
+%% Do we want to work on a command  chain? Basically toPPT()
+
+isCommandChain = 0;
+hasNoErrors    = 1;
+
+structMyArgument = deleteFromArgumentAndGetValue(varargin,'commandChain');
+if ~isempty(structMyArgument.value)
+    commandChain     = structMyArgument.value;
+    varargin         = structMyArgument.arguments;
+    isCommandChain   = 1;
+end
+    
+
+if isCommandChain
+    % The argument (or second paramter of toPPT has all commands as cell => lets check that)
+    if iscell(commandChain)
+        % Only one argument and the argument is a cell itself
+        
+        % Overwrite argument varagin with command chain 
+        varargin = commandChain;
+
+    else
+        hasNoErrors = 0;
+        warning('The command chain (COC) needs to be defined as cell. E.g COC{1} = "setTitle",  COC{2} = "This is my test title" or COC = {"setTitle","This is my test title"}... ')
+    end
+end
+
+
 
 %%% pub %%% e.g. NE
 structMyArgument = deleteFromArgumentAndGetValue(varargin,'pub');
@@ -363,7 +391,11 @@ end
 
 %%%
 
-if doPublishing %uncomment later //Todo
+if doPublishing && hasNoErrors %uncomment later
+    
+
+    
+    
 %% In this section we will have to distinguish between text and figures
 
 %%% Check if we want to translate text to QR
@@ -377,7 +409,8 @@ if ~isempty(structMyArgument.value)
 end
 
 if textAsQRCode
-    if strcmp(version('-release'),'2014b') || strcmp(version('-release'),'2014a')
+    %if strcmp(version('-release'),'2014b') || strcmp(version('-release'),'2014a')
+    if matlabVersionChecker('2014a')
         % Get additional parameters
         %%% QR code parameters %%% Parameter 'Size':Parameter 'Version':
         %%% 'ErrQuality': 'CharacterSet': 'DownloadJars':
@@ -874,15 +907,55 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
         
         %% Gerneral Behaviour => 
         
+        %% Setting up the page -  PageSetup
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'setPageFormat');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.pageFormat        = structMyArgument.value;
+            arguments               = structMyArgument.arguments;
+            myArg.isGeneralCommand  = 1;
+            myArg.doSetPageFormat   = 1;
+        end
+        
+        
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'setPageOrientation');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.pageOrientation        = structMyArgument.value;
+            arguments                    = structMyArgument.arguments;
+            myArg.isGeneralCommand       = 1;
+            myArg.doSetPageOrientation   = 1;
+        end
+        
+        
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'setFirstSlideNumber');
+        if ~isempty(structMyArgument.value)
+            myArg.firstSlideNumber  = structMyArgument.value;
+            arguments               = structMyArgument.arguments;
+            myArg.isGeneralCommand  = 1;
+            myArg.doSetFirstSlideNumber   = 1;
+        end
         
         % Do we want to apply a template - we should do this the first time
         % we call a new presentation
         structMyArgument = deleteFromArgumentAndGetValue(arguments,'applyTemplate');
+        
         if ~isempty(structMyArgument.value)
-            myArg.templatePath          = structMyArgument.value;
+            myArg.templatePath      = structMyArgument.value;
             arguments               = structMyArgument.arguments;
             myArg.isGeneralCommand  = 1;
             myArg.doApplyTemplate   = 1;
+        end
+        
+        % Do we want to open an existing presentation instead of creating
+        % a new one or using an active one?
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'openExisting');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.existingPPTPath   = structMyArgument.value;
+            arguments               = structMyArgument.arguments;
+            myArg.isGeneralCommand  = 1;
+            myArg.doOpenPPT         = 1;
         end
         
         
@@ -1034,6 +1107,17 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             myArg.defaultTitle           = structMyArgument.value;
             arguments              = structMyArgument.arguments;
             myArg.doSetTitle             = 1;
+        end
+        %%%
+        
+        
+        %%% asComment %%%
+        structMyArgument        = deleteFromArgumentAndGetValue(arguments,'asComment');
+        if ~isempty(structMyArgument.value)
+            myArg.comment       = structMyArgument.value;
+            arguments           = structMyArgument.arguments;
+            myArg.addComment     = 1;
+            %myArg.isGeneralCommand  = 1;
         end
         %%%
 

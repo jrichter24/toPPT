@@ -262,7 +262,7 @@ end
                 curDownloadPath = [qrcodeProps.jar.inet.path,qrcodeProps.jar.files{jj},'/',qrcodeProps.jar.ver,'/',qrcodeProps.jar.files{jj},'-',qrcodeProps.jar.ver,'.jar'];
                 saveToFileName = [filePath,qrcodeProps.jar.files{jj},'-',qrcodeProps.jar.ver,'.jar'];
                 
-                if strcmp(version('-release'),'2014b')
+                if matlabVersionChecker('2014b')
                     websave(saveToFileName,curDownloadPath);
                 else
                     urlwrite(curDownloadPath,saveToFileName);

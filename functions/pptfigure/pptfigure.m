@@ -243,7 +243,8 @@ end
 
 
 
-if strcmp(version('-release'),'2014b')
+%if strcmp(version('-release'),'2014b')
+if matlabVersionChecker('2014b')
     
     % We are going to delete this after we found the right entries for the legend
     axesListTemp = findall(H,'type','axes'); 
@@ -1269,7 +1270,8 @@ for obj = length(objects):-1:1
                 invoke(pic.Item(2),'Delete');
                 
                 %Matlab version hack
-                if strcmp(version('-release'),'2014b') && ~strcmp(type,'text')
+                %if strcmp(version('-release'),'2014b') && ~strcmp(type,'text')
+                if matlabVersionChecker('2014b')    
                 	invoke(pic.Item(3),'Delete');
                 end
             end
@@ -1602,7 +1604,8 @@ if ~isempty(setdiff(axesList,objects(find(invisible)))) %#ok<FNDSB>
     elseif ~strcmp(get(H,'color'),'none')
         invoke(pic.Item(2),'Delete');
         %Matlab version hack
-        if strcmp(version('-release'),'2014b') && ~strcmp(type,'text')
+        %if strcmp(version('-release'),'2014b') && ~strcmp(type,'text')
+        if matlabVersionChecker('2014b') && ~strcmp(type,'text')  
             invoke(pic.Item(3),'Delete');
         end
         deleted(end+1) = 2;

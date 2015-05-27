@@ -64,15 +64,41 @@ end
 
 % Connect to PowerPoint
 
+try
+    ppt = actxserver('PowerPoint.Application');
+catch
+    warning('An error occured connetcion to your powerpoint application. Is powerpoint installed on your system?');
+end
 
-ppt = actxserver('PowerPoint.Application');
+% Open current presentation or try to load existing presentation
+if myArg.doOpenPPT
+    try
+        op = ppt.Presentations.Open(myArg.existingPPTPath);
+    catch
+        
+        % Check if file is exisiting on file system
+        isExisting = isequal(exist(myArg.existingPPTPath),2);
+        
+        if isExisting
+            warning(['An error occured loading: ',myArg.existingPPTPath,'. The file is existing but can not be opened? Sometime closing and loading the same file directly after each other can lead to this error. Just wait a few seconds between doing so. An active presentation will be used instead. If there is no active presentation a new one will be created.']);
+        else
+            warning(['An error occured loading: ',myArg.existingPPTPath,'. The file is not existing or not readable -  Right path? An active presentation will be used instead. If there is no active presentation a new one will be created.']);
+        end
+        
+        
+        
+        myArg.doOpenPPT = 0; % Set back to normal mode
+    end
+end
 
 
-% Open current presentation
-if get(ppt.Presentations,'Count')==0
-    op = invoke(ppt.Presentations,'Add');
-else
-    op = get(ppt,'ActivePresentation');
+if ~myArg.doOpenPPT
+    
+    if get(ppt.Presentations,'Count')==0
+        op = invoke(ppt.Presentations,'Add');
+    else
+        op = get(ppt,'ActivePresentation');
+    end
 end
 
 
@@ -205,6 +231,11 @@ if ~myArg.isGeneralCommand
     if myArg.doSetText
         setText(myArg,slide,myFormattedText)   
     end
+    
+    %Case: Set Text
+    if myArg.addComment
+        addComment(myArg,slide,op);
+    end
 
     %Case: Set Table
     if myArg.doSetTable
@@ -229,9 +260,25 @@ else %% We want to perform a gerneal Command like saving
         savePPT(myArg,op);
     end
     
+    
     %% Close presentation
     if myArg.doClose
         closePPT(myArg,op)
+    end
+    
+    
+    %% Page Setup - Format
+    if myArg.doSetPageFormat
+        setPageFormat(myArg,op)
+    end
+    
+    
+    if myArg.doSetPageOrientation
+        setPageOrientation(myArg,op)
+    end
+    
+    if myArg.doSetFirstSlideNumber
+        setFirstSlideNumber(myArg,op)
     end
 
     
@@ -272,14 +319,141 @@ function slideNumberIndex = getSlideNumberByTitle(myArg,op,slide_count)
     [~,slideNumberIndex] = min(editDistanceArray);
 end
 
-%% Apply template
+
+%% Close presentation
 function closePPT(myArg,presentation)
     try
         presentation.Saved = 1;
         presentation.Close;
         
     catch
-        display('Closing presentation failed!');
+        warning('Closing presentation failed!');
+    end
+end
+
+
+%% Page Format set
+function setPageFormat(myArg,presentation)
+
+    isSettable = 0; % Do we found a matching format?
+    
+    newWidthPixel  = 0; % Will be overwritten
+    newHeightPixel = 0; % Will be overwritten
+    
+    % We have to distinguist between different pageFormat inputs
+    pageFormatData = myArg.pageFormat;
+    
+    if ischar(pageFormatData)
+        % Find format definition in toPPT_config
+        if ~isempty(find(ismember(myArg.knownPageFormats,pageFormatData))== 1)
+            
+            widthHeightInch = myArg.knownPageFormatsDesc(ismember(myArg.knownPageFormats,pageFormatData));
+            
+            newWidthPixel  = 72*widthHeightInch{1}(1);
+            newHeightPixel = 72*widthHeightInch{1}(2);
+            
+            isSettable = 1;
+            
+        end
+        
+    elseif isnumeric(pageFormatData)
+        if numel(pageFormatData) == 2
+            
+            newWidthPixel  = pageFormatData(1);
+            newHeightPixel = pageFormatData(2);
+            
+            isSettable = 1;
+        end
+    end
+        
+
+    
+    % setting the pageformat
+    if isSettable
+        presentation.PageSetup.SlideWidth  = newWidthPixel;   % 21 * 72;
+        presentation.PageSetup.SlideHeight = newHeightPixel; % 8.5 * 72;
+    else
+        warning('Applying page format failed! - Use a known format like "4:3" or set a format via an array like [10*72,10*72] (width, height) in pixel.');
+    end
+    
+end
+
+%% Set page orientation to landscape or portrait
+function setPageOrientation(myArg,presentation)
+
+    isSettable = 0; % Do we find a matching format?
+    
+    pageOrientationData = myArg.pageOrientation;
+    
+    if ischar(pageOrientationData)
+        if ~isempty(find(ismember(myArg.knownPageOrientations,pageOrientationData))== 1)
+            
+            isSettable = 1;
+            
+            
+        end
+    end
+    
+    if isSettable
+        
+        % Apply new orientation
+        % page Orientation is valid
+        
+            if strcmp(pageOrientationData,'invert')
+                
+                % Just switch postions of height and width
+                oldWidth = presentation.PageSetup.SlideWidth;
+                presentation.PageSetup.SlideWidth = presentation.PageSetup.SlideHeight;
+                presentation.PageSetup.SlideHeight = oldWidth;
+                
+            elseif strcmp(pageOrientationData,'landscape')
+                % Width should be bigger equal height
+                oldWidth  = presentation.PageSetup.SlideWidth;
+                oldHeight = presentation.PageSetup.SlideHeight;
+                
+                if oldWidth<oldHeight
+                    % Just switch postions of height and width
+                    oldWidth = presentation.PageSetup.SlideWidth;
+                    presentation.PageSetup.SlideWidth = presentation.PageSetup.SlideHeight;
+                    presentation.PageSetup.SlideHeight = oldWidth;    
+                end
+                
+            elseif strcmp(pageOrientationData,'portrait')
+                
+                % Width should be smaller equal height
+                oldWidth  = presentation.PageSetup.SlideWidth;
+                oldHeight = presentation.PageSetup.SlideHeight;
+                
+                if oldWidth>oldHeight
+                    % Just switch postions of height and width
+                    oldWidth = presentation.PageSetup.SlideWidth;
+                    presentation.PageSetup.SlideWidth = presentation.PageSetup.SlideHeight;
+                    presentation.PageSetup.SlideHeight = oldWidth;    
+                end
+                
+            end
+    else
+        warning('Applying page orientation failed! - Use a known format (landscape,portrait,invert).');
+    end
+    
+
+end
+
+
+function setFirstSlideNumber(myArg,presentation)
+
+    isSettable = 0; % Can we assign this slidenumber
+    
+    if isnumeric(myArg.firstSlideNumber)
+        isSettable = 1;
+    end
+    
+    if isSettable
+        try
+            presentation.PageSetup.FirstSlideNumber = myArg.firstSlideNumber;
+        catch
+            warning('Assinging first slide number failed! The first slide number needs to be a numerical scalar value bigger or equal 0 and smaller than the maximum allowed number of slides (in Powerpoint 2013 = 9999)');
+        end
     end
 end
 
@@ -289,7 +463,7 @@ function applyTemplate(myArg,presentation)
     try
         presentation.ApplyTemplate(myArg.templatePath);
     catch
-        display(['Applying template failed! - Right templatepath? Path: ',myArg.templatePath]);
+        warning(['Applying template failed! - Right templatepath? Path: ',myArg.templatePath]);
     end
 end
 
@@ -304,9 +478,9 @@ function savePPT(myArg,presentation)
         fullpath = [myArg.savePath,'./',myArg.saveFilename,'.',defaultExtension];
         %% Save
         try
-        presentation.SaveAs(fullpath);
+            presentation.SaveAs(fullpath);
         catch
-            display('Saving presentation failed!');
+            warning('Saving presentation failed! Please make sure that path is already existing. ToPPT will intentionally not create folders for you.');
         end
         
     elseif (myArg.doSavePPTPath)
@@ -317,7 +491,7 @@ function savePPT(myArg,presentation)
         try
         presentation.SaveAs(fullpath);
         catch
-            display('Saving presentation failed!');
+            warning('Saving presentation failed!');
         end
         
     elseif (myArg.doSavePPTFilename)
@@ -327,7 +501,7 @@ function savePPT(myArg,presentation)
         try
         presentation.SaveAs(fullpath);
         catch
-            display('Saving presentation failed!');
+            warning('Saving presentation failed!');
         end
     end
 
@@ -357,7 +531,7 @@ function setTitle(myArg,slide)
             end
         end
     catch
-        display('Error using Tex interpreter - please check if your tex code has no errors')
+        warning('Error using Tex interpreter - please check if your tex code has no errors')
         try
                set(slide.Shapes.Title.TextFrame.TextRange,'Text',myArg.defaultTitle);
         catch
@@ -538,7 +712,7 @@ function myFormattedText = intperetHtml(myFormattedText,textRange,myArg)
             set(textRange,'Text',myAddText); %No Tex
         end
     catch
-         display('Error using Tex interpreter - please check if your tex code has no errors')
+         warning('Error using Tex interpreter - please check if your tex code has no errors')
          set(textRange,'Text',myAddText);
     end
 
@@ -720,6 +894,36 @@ function substring = getSubstring(offset,fullString,charStart,charStop)
         end
         
     end
+end
+
+
+function addComment(myArg,slide,op)
+
+
+% Set cmtNew = sldNew.Comments.Add(Left:=12, Top:=12, _Author:="Jeff Smith", AuthorInitials:="JS", _
+% 
+%         Text:="You might consider reviewing the new specs" & _"for more up-to-date information.")
+
+if  iscell(myArg.comment)
+    if numel(myArg.comment) == 3
+        curAutohor     = myArg.comment{1};
+        curAutohorIn   = myArg.comment{2};
+        curTextComment = myArg.comment{3};
+    elseif numel(myArg.comment) == 1
+       curAutohor     = 'Powerpoint Author';
+       curAutohorIn   = 'PA';
+       curTextComment = myArg.comment{1}; 
+    end
+elseif ischar(myArg.comment)
+     curAutohor     = 'Powerpoint Author';
+     curAutohorIn   = 'PA';
+     curTextComment = myArg.comment;
+end
+
+slide.Comments.Add(myArg.userLeft,myArg.userTop,curAutohor,curAutohorIn,curTextComment);
+
+display('here');
+
 end
 
 %%

@@ -3,7 +3,7 @@
 
 function saveCopyProperties(sourceObj,targetObj,corrector)
 
-    if strcmp(version('-release'),'2014b')
+    if matlabVersionChecker('2014b')
         
         % Get properties from sourceObj
         propStruct = get(sourceObj);
@@ -45,7 +45,7 @@ function saveCopyProperties(sourceObj,targetObj,corrector)
         end
 
     else
-        warning('This function is only available for Matlab release 2014b')
+        warning('This function is only available for Matlab release 2014b and later')
     end
 
 end
