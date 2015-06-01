@@ -79,10 +79,22 @@ function posStructure = getPosParameters(rawPos)
 
 %myTileParameters = getTileParameters(myPresentationWidth,myPresentationHeight,stringPos);
 
-myTileParameters = getTileParameters(rawPos);
-posStructure     = getObjectInTileParameters(rawPos,myTileParameters);
+if isnumeric(rawPos.stringPos)
+    posStructure = getObjectParametersNumeric(rawPos);
+end
 
+if ischar(rawPos.stringPos)
+    myTileParameters = getTileParameters(rawPos);
+    posStructure     = getObjectInTileParameters(rawPos,myTileParameters);
+end
 
+if ~isnumeric(rawPos.stringPos) && ~ischar(rawPos.stringPos)
+    warning('Error: The position needs to be a string value like C, N, W, a single value like 200 or an array of two values e.g. [200,200]!. C will be used instead.');
+    
+    rawPos.stringPos = 'C';
+    myTileParameters = getTileParameters(rawPos);
+    posStructure     = getObjectInTileParameters(rawPos,myTileParameters);
+end
 
 
 
@@ -223,13 +235,185 @@ function posStructure = getObjectInTileParameters(rawPos,myTileParameters)
 end
 
 
+function myTileParameters = getObjectParametersNumeric(rawPos)
+
+    myTileParameters = getObjectParametersPositionNumeric(rawPos);
+
+end
+
+function posStructure = getObjectParametersPositionNumeric(rawPos)
+
+    objectHeight                  = rawPos.objectHeight; % The size of the original image
+    objectWidth                   = rawPos.objectWidth;
+    height                        = rawPos.userHeight;
+    width                         = rawPos.userWidth;
+
+    defaultWidthPercentage        = rawPos.defaultwidthPercentage;
+    widthPercentageByUser         = rawPos.widthPercentageByUser;
+    defaultHeightPercentage       = rawPos.defaultheightPercentage;
+    heightPercentageByUser        = rawPos.heightPercentageByUser;
+    posPercentageByUser           = rawPos.posPercentageByUser;
+    
+    
+    myPresentationWidth           = rawPos.myPresentationWidth;
+    myPresentationHeight          = rawPos.myPresentationHeight;
+    
+    % For text adding
+    if isempty(height)
+        height = myPresentationHeight/2;
+    end
+    
+    if isempty(width)
+        width = myPresentationWidth/2;
+    end
+    
+    
+    if numel(rawPos.stringPos)==2
+        posX = rawPos.stringPos(1);
+        posY = rawPos.stringPos(2);
+    elseif numel(rawPos.stringPos)==1
+        posX = rawPos.stringPos(1);
+        posY = rawPos.stringPos(1);
+    else
+        warning('Error: The position needs to be a string value like C, N, W a single value like 200 or an array of two values e.g. [200,200]!');
+    end
+    
+    if posPercentageByUser
+        posX = round(myPresentationWidth*posX/100);
+        posY = round(myPresentationHeight*posY/100);
+    end
+    
+    
+ 
+    
+    
+    % Get pos Anker
+    
+    posAnker = rawPos.defaultPosAnker;
+    
+    
+    %% First lets see which mode of fitting we want to use
+        %Width                - Fit object to certain Width in the tile and keep aspect ratio 
+        %Height               - Fit object to certain Height in the tile and keep aspect ratio 
+        %Width Height         - Fit object to certain Height and width in the tile - must not keep aspect ratio  
+        %Width%               - Fit object to for example 60% in Width of the tile and keep aspect ratio
+        %Height%(standard)    - Fit object to for example 60% in Height of the tile and keep aspect ratio
+
+    %% Calculate %[top, left, width and height] of object in tile coordinate system
+    
+    
+    if isempty(height) && isempty(width)
+        % No information about widht and height is specified
+        
+        if ~heightPercentageByUser && ~widthPercentageByUser
+            % Even no percentage data was specified
+            height = round(myPresentationWidth*defaultWidthPercentage/100);
+            width  = round(myPresentationHeight*defaultHeightPercentage/100);
+        end
+        
+        if heightPercentageByUser && ~widthPercentageByUser
+            % Only the height in percentage is supplied
+            height = round(myPresentationHeight*defaultHeightPercentage/100);
+            
+            % Calculate width keeping aspect ration
+            aspectratio   = objectHeight/objectWidth;
+            if aspectratio>0
+                width        = round(height/aspectratio);
+            else
+                width        = height;
+            end
+            
+        end
+        
+        if ~heightPercentageByUser && widthPercentageByUser
+            % Only the width in percentage is supplied
+            width = round(myPresentationWidth*defaultWidthPercentage/100);
+            
+            % Calculate width keeping aspect ration
+            aspectratio   = objectHeight/objectWidth;
+            height        = round(width*aspectratio);
+            
+        end
+        
+        if heightPercentageByUser && widthPercentageByUser
+            % WidthPercentage and Heighterentage is given
+            width  = round(myPresentationWidth*defaultWidthPercentage/100);
+            height = round(myPresentationHeight*defaultHeightPercentage/100);
+
+        end
+        
+    end
+    
+    if isempty(height) && ~isempty(width)
+        % Only width is given
+        % Calculate width keeping aspect ration
+        aspectratio   = objectHeight/objectWidth;
+        height        = round(width*aspectratio);
+    end
+    
+    if ~isempty(height) && isempty(width)
+        % Only height is given
+        % Calculate width keeping aspect ration
+        aspectratio   = objectHeight/objectWidth;
+        if aspectratio>0
+            width        = round(height/aspectratio);
+        else
+            width        = height;
+        end
+    end
+    
+
+
+    switch posAnker
+        case 'NW'
+            offsetX = width/2;
+            offsetY = height/2;
+        case 'N'
+            offsetX = 0;
+            offsetY = height/2;
+        case 'NE'
+            offsetX = -width/2;
+            offsetY = height/2;
+        case 'W'
+            offsetX = width/2;
+            offsetY = 0;
+        case 'C'
+            offsetX = 0;
+            offsetY = 0;
+        case 'E'
+            offsetX = -width/2;
+            offsetY = 0;
+        case 'SW'
+            offsetX = width/2;
+            offsetY = -height/2;
+        case 'S'
+            offsetX = 0;
+            offsetY = -height/2;
+        case 'SE'
+            offsetX = -width/2;
+            offsetY = -height/2;
+        otherwise
+            warning('Error: The posAnker needs to be a string value (NW,N,NE,W,C,E,SW,S,SE).');
+            
+    end
+    
+    
+    %% Now lets transform back to the coordinate system of the slide - it's easy ;-)
+    
+    posStructure.top    = posY-height/2+offsetY;
+    posStructure.left   = posX-width/2+offsetX;
+    posStructure.width  = width;
+    posStructure.height = height;
+
+end
+
 
 
 function myTileParameters = getTileParameters(rawPos)
 
 %Get data
 
-stringPos = rawPos.stringPos ;
+stringPos = rawPos.stringPos;
 
 
 %First we have to split the pos String into all subtiles
@@ -405,11 +589,11 @@ tempCounter = 1;
 
 subtilesCoordinates{1} = [0,0,0,0];
 
-choosenVersion = 1;
+choosenVersion  = 1;
 heightMatrixOne = zeros(3,2); %Gives us a basic overview of the choosen tiles and their height
 heightMatrixTwo = zeros(4,2); %Gives us a basic overview of the choosen tiles and their height
-widthMatrixOne = zeros(3,2); %Gives us a basic overview of the choosen tiles and their width
-widthMatrixTwo = zeros(4,2); %Gives us a basic overview of the choosen tiles and their width
+widthMatrixOne  = zeros(3,2); %Gives us a basic overview of the choosen tiles and their width
+widthMatrixTwo  = zeros(4,2); %Gives us a basic overview of the choosen tiles and their width
 
      % a(1,2) = 1
      %============

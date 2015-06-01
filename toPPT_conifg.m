@@ -20,12 +20,12 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     
     % Connect elements with arrows
     
-    % Improve postioning of graphs and texts by pixel/percentage position
+    % Improve postioning of graphs and texts by pixel/percentage position DONE
     
     % Add notes to certain slides
     % Notes: op.NotesMaster.HeadersFooters.Footer.Text = 'Volcano Coffee'
     
-    % Bundle slides to sections
+    % Bundle slides to sections DONE
     
     % Correct pptfigure for matlab 2015a again :-(
     
@@ -39,10 +39,13 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     
     % Change format and orientation of presentation DONE
     
-    % Password encryption - Protect
+    % Password encryption - Protect DONE
     
     % Update qr code quietzone setting
+    
+    % Tables can use css tags and TEx DONE
 
+    % Tables and normal texxt can use new css tag bg for bacground color DONE
 
 
 
@@ -66,7 +69,8 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     toPPTFigure.myPresentationWidth      = [];
     toPPTFigure.objectHeight             = [];
     toPPTFigure.objectWidth              = [];
-    
+    toPPTFigure.defaultPosAnker          = 'C';                             %% User can change value
+    toPPTFigure.posPercentageByUser      = 0;
     
     % Additional for figures in png format
     toPPTFigurePNG                       = toPPTFigure;
@@ -102,7 +106,8 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     toPPTText.doSavePPTPath             = 0; 
     toPPTText.doSavePPTFilename         = 0;
     toPPTText.doClose                   = 0;
-    
+    toPPTText.hasSavePassword           = 0;  % By default save presentations without password
+    toPPTText.savePassword              = '';
     % Open
     toPPTText.doOpenPPT                 = 0;
     
@@ -133,11 +138,15 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     toPPTText.userTop                   = [];
     toPPTText.userWidth                 = [];
     toPPTText.doTexText                 = 1; % By default in each text attribute tex code is searched
+    toPPTText.posPercentageByUser       = 0;
+    toPPTText.userSection               = [];
+    toPPTText.doAddSection              = 0;
     
     toPPTText.myPresentationHeight      = [];
     toPPTText.myPresentationWidth       = [];
     toPPTText.objectHeight              = [];
     toPPTText.objectWidth               = [];
+    toPPTText.defaultPosAnker           = 'NW';                             %% User can change value
     
     toPPTText.doSetHyper                = 0;
     toPPTText.defaultHyperlink          = 'MyHyperLink';

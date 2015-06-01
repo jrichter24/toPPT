@@ -183,7 +183,7 @@ toPPT('setTitle','Example 4 \gamma -  Using TeX and css-tags in texts at the sam
 myTexText = texlabel('lambda12^(3/2)/pi - pi*delta^(2/3)');
 
 toPPT(myTexText,'SlideNumber','append');
-toPPT(['<s color:orange>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>'],'pos','NEH');
+toPPT(['<s bg:red; color:orange>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>'],'pos','NEH');
 toPPT({'TeX Interpreter is off:',['<s color:blue>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>']},'pos','SWH','TeX',0); % TeX interpreter turned off
 
 toPPT('setTitle','Example 4 \phi - Using TeX in texts together with matlab build in texlabel-function');
@@ -236,15 +236,15 @@ toPPT('New updated Text in slide Number 4','SlideNumber',4,'pos','SW'); % Adds a
 % The syntax is: *toPPT('setTable',{stringCellTableCaption, matrix/Vector/cell})*
 
 helpTableCell      = cell(2,3);
-helpTableCell{1,1} = 'Me is first';
-helpTableCell{1,2} = 'Me is second';
-helpTableCell{1,3} = 'Me is third';
-helpTableCell{2,1} = 'Me is fourth';
+helpTableCell{1,1} = '<s bg:red; color:white><i>Me is first<\i><\s>';
+helpTableCell{1,2} = 'Example 4 \phi';
+helpTableCell{1,3} = ['<s color:orange>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>'];
+helpTableCell{2,1} = '<s color:#5F9EA0; font-size:22; font-family:Aharoni>Me is fourth</s>';
 helpTableCell{2,2} = 'Me is fifth';
 helpTableCell{2,3} = 'Me is sixth';
 
 % First slide -  It is important to add "helpTableCell" into an extra cell {}
-toPPT('setTable',{{'Caption1','Caption2','Caption3'},{helpTableCell}},'SlideNumber','append');
+toPPT('setTable',{{'<s bg:red>Caption1<\s>','Caption2','Caption3'},{helpTableCell}},'SlideNumber','append','Width',300);
 toPPT('setTitle','Example 5a - Adding tables using cell of strings');
 
 % Second slide - auto rotate will be used
@@ -432,6 +432,13 @@ toPPT('savePath',savePath,'saveFilename',saveFilename);
 toPPT(['We saved our presentation to: ',savePath,'/',saveFilename],'SlideNumber','append','TeX',0); % Because we want to "show" a filename we should turn of TeX otherwise all "\" will be gone etc.
 toPPT('setTitle','Example 14 - Saving a presentation');
 
+
+savePath = pwd;
+saveFilename = 'passwordTest';
+
+toPPT('savePath',savePath,'saveFilename',saveFilename,'savePassword',123);
+
+
 %% Example 15 - Closing a presentation:
 % We can close a presentation with toPPT - this can be helpful if we want
 % to create multiple different presentations and close them after we saved 
@@ -448,6 +455,65 @@ close all;
 %% Valid Parmeters for toPPT:
 % *For a detailed help simply use 'help toPPT'*
 
+
+toPPT('asComment',{'Jens Richter','JR','Test12345'});
+toPPT('openExisting','C:\Users\Jens\Dropbox\Git-Repos\Matlab\passwordTest.pptx')
+
+figure1 = example_helper(2);
+toPPT(figure1,'Height',200,'Width',100);
+
+
+figure1 = example_helper(2);
+toPPT(figure1,'Width',200);
+
+figure1 = example_helper(2);
+toPPT(figure1,'Height',200);
+
+
+figure1 = example_helper(2);
+toPPT(figure1,'pos',[100,100],'Width',200,'Height',200);
+
+figure1 = example_helper(2);
+toPPT(figure1,'pos',[200,200],'Width',200,'Height',200,'posAnker','C');
+
+figure1 = example_helper(2);
+toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','NW');
+toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','SW','SlideNumber','current');
+toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','SE','SlideNumber','current');
+toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','NE','SlideNumber','current');
+toPPT(figure1,'pos%',[50,50],'Width%',50,'Height%',10,'posAnker','C','SlideNumber','current');
+
+toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','N','SlideNumber','current');
+toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','S','SlideNumber','current');
+toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','E','SlideNumber','current');
+toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','W','SlideNumber','current');
+
+toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','N','SlideNumber','current');
+toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','S','SlideNumber','current');
+toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','E','SlideNumber','current');
+toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','W','SlideNumber','current');
+
+
+toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','C','SlideNumber','append');
+toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','S','SlideNumber','current');
+toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','E','SlideNumber','current');
+toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','W','SlideNumber','current');
+
+toPPT(figure1,'pos',[200,200],'Width',100,'posAnker','C','SlideNumber','append');
+toPPT('test','pos',[200,200],'Width',100,'posAnker','C','SlideNumber','append');
+
+toPPT('test','pos',[200,200],'Width',100,'posAnker','W','SlideNumber','append');
+toPPT('test','pos',[200,200],'SlideNumber','append');
+
+toPPT({'test2','test','test','test'},'pos',[200,200],'SlideNumber','current');
+
+toPPT({'test2','test','test','test'},'pos%',[50,50],'SlideNumber','append');
+
+toPPT('addSection',{'Test'});
+
+toPPT('addSection','Test','SlideNumber','Axample 3a - bddinaag a figure at a cerdastain positiddd5on','SlideAddMethod','before')
+
+toPPT('addSection','Test2','SlideNumber',10,'SlideAddMethod','after')
 
 %% toPPT accepts the following predefined colors:
 %     %White colors

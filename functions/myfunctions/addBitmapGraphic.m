@@ -6,7 +6,7 @@ function addBitmapGraphic(myFigure,myArg)
 ppt = actxserver('PowerPoint.Application');
 
 % Open current presentation
-if get(ppt.Presentations,'Count')==0
+if get(ppt.Presentations,'Count') == 0
     op = invoke(ppt.Presentations,'Add');
 else
     op = get(ppt,'ActivePresentation');
@@ -29,33 +29,33 @@ invoke(slide_pane,'Activate');
 
 
 
-% Identify current slide
-try
-    currSlide = wind.Selection.SlideRange.SlideNumber;
-catch %#ok<CTCH>
-    % No slides
-end
+% % Identify current slide
+% try
+%     currSlide = wind.Selection.SlideRange.SlideNumber;
+% catch %#ok<CTCH>
+%     % No slides
+% end
+% 
+% % Select the slide to which the figure will be exported
+% slide_count = int32(get(op.Slides,'Count'));
+% if strcmpi(myArg.defaultSlideNumber,'append')
+%     slide = invoke(op.Slides,'Add',slide_count+1,11);
+%     shapes = get(slide,'Shapes');
+%     invoke(slide,'Select');
+%     invoke(shapes.Range,'Delete');
+% else
+%     if strcmpi(myArg.defaultSlideNumber,'last')
+%         slideNum = slide_count;
+%     elseif strcmpi(myArg.defaultSlideNumber,'current');
+%         slideNum = get(wind.Selection.SlideRange,'SlideNumber');
+%     else
+%         slideNum = myArg.defaultSlideNumber;
+%     end
+%     slide = op.Slides.Item(slideNum);
+%     invoke(slide,'Select');
+% end
 
-% Select the slide to which the figure will be exported
-slide_count = int32(get(op.Slides,'Count'));
-if strcmpi(myArg.defaultSlideNumber,'append')
-    slide = invoke(op.Slides,'Add',slide_count+1,11);
-    shapes = get(slide,'Shapes');
-    invoke(slide,'Select');
-    invoke(shapes.Range,'Delete');
-else
-    if strcmpi(myArg.defaultSlideNumber,'last')
-        slideNum = slide_count;
-    elseif strcmpi(myArg.defaultSlideNumber,'current');
-        slideNum = get(wind.Selection.SlideRange,'SlideNumber');
-    else
-        slideNum = myArg.defaultSlideNumber;
-    end
-    slide = op.Slides.Item(slideNum);
-    invoke(slide,'Select');
-end
-
-
+[slide,~] = translateSlideNumberInformation2Slide(myArg,ppt,op,1);
 
 
 

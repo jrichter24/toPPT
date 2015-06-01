@@ -801,6 +801,23 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
         end
         %%%
         
+        %%% Position in Percentage only applies if pos% is NOT a string!
+        %%% e.g. pos% = [10,10] in %
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'pos%');
+        if ~isempty(structMyArgument.value)
+            myArg.stringPos            = structMyArgument.value;
+            myArg.posPercentageByUser  = 1;
+            arguments                  = structMyArgument.arguments;
+        end
+        %%%
+        
+        %%% elementAnker only applies if pos is NOT a string! e.g. pos = [200,200]
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'posAnker');
+        if ~isempty(structMyArgument.value)
+            myArg.defaultPosAnker = structMyArgument.value;
+            arguments             = structMyArgument.arguments;
+        end
+        
          %%% defaultOuterGapTileN %%% e.g. 10 //in px
         structMyArgument = deleteFromArgumentAndGetValue(arguments,'gapN');
         if ~isempty(structMyArgument.value)
@@ -898,7 +915,15 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             arguments              = structMyArgument.arguments;
         end
         %%%
-
+        
+        
+        %%% Absolute center position %%%
+        structMyArgument       = deleteFromArgumentAndGetValue(arguments,'Left');
+        if ~isempty(structMyArgument.value)
+            myArg.userLeft                   = structMyArgument.value;
+            arguments              = structMyArgument.arguments;
+        end
+        %%%
 
 
     end
@@ -925,6 +950,16 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             arguments                    = structMyArgument.arguments;
             myArg.isGeneralCommand       = 1;
             myArg.doSetPageOrientation   = 1;
+        end
+        
+        % Adds a section
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'addSection');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.userSection            = structMyArgument.value;
+            arguments                    = structMyArgument.arguments;
+            myArg.isGeneralCommand       = 1;
+            myArg.doAddSection           = 1;
         end
         
         
@@ -971,6 +1006,15 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             myArg.doSavePPTPath     = 1;
         end
         
+        % This only applies if savePath or saveFilename arument was set in
+        % addition
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'savePassword');
+        if ~isempty(structMyArgument.value)
+            myArg.savePassword      = structMyArgument.value;
+            arguments               = structMyArgument.arguments;
+            myArg.hasSavePassword   = 1;
+        end
+        
         structMyArgument = deleteFromArgumentAndGetValue(arguments,'close');
         if ~isempty(structMyArgument.value)
             myArg.close          = structMyArgument.value;
@@ -997,6 +1041,24 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
         if ~isempty(structMyArgument.value)
             myArg.stringPos = structMyArgument.value;
             arguments        = structMyArgument.arguments;
+        end
+        %%%
+        
+        %%% Position in Percentage only applies if pos% is NOT a string!
+        %%% e.g. pos% = [10,10] in %
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'pos%');
+        if ~isempty(structMyArgument.value)
+            myArg.stringPos            = structMyArgument.value;
+            myArg.posPercentageByUser  = 1;
+            arguments                  = structMyArgument.arguments;
+        end
+        %%%
+        
+        %%% elementAnker only applies if pos is NOT a string! e.g. pos = [200,200]
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'posAnker');
+        if ~isempty(structMyArgument.value)
+            myArg.defaultPosAnker = structMyArgument.value;
+            arguments             = structMyArgument.arguments;
         end
         %%%
 

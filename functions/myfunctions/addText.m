@@ -80,7 +80,7 @@ if myArg.doOpenPPT
         isExisting = isequal(exist(myArg.existingPPTPath),2);
         
         if isExisting
-            warning(['An error occured loading: ',myArg.existingPPTPath,'. The file is existing but can not be opened? Sometime closing and loading the same file directly after each other can lead to this error. Just wait a few seconds between doing so. An active presentation will be used instead. If there is no active presentation a new one will be created.']);
+            warning(['An error occured loading: ',myArg.existingPPTPath,'. The file is existing but can not be opened? Was a password assigned? It is not possible to open password protected files by toPPT! Sometime closing and loading the same file directly after each other can lead to this error. Just wait a few seconds between doing so. An active presentation will be used instead. If there is no active presentation a new one will be created.']);
         else
             warning(['An error occured loading: ',myArg.existingPPTPath,'. The file is not existing or not readable -  Right path? An active presentation will be used instead. If there is no active presentation a new one will be created.']);
         end
@@ -113,97 +113,98 @@ if ~myArg.isGeneralCommand
     myArg.myPresentationWidth  = op.PageSetup.SlideWidth; %in px
 
 
-    % Set slide object to be the active pane
-    wind = get(ppt,'ActiveWindow');
-    panes = get(wind,'Panes');
-    slide_pane = invoke(panes,'Item',2);
-    invoke(slide_pane,'Activate');
+%     % Set slide object to be the active pane
+%     wind = get(ppt,'ActiveWindow');
+%     panes = get(wind,'Panes');
+%     slide_pane = invoke(panes,'Item',2);
+%     invoke(slide_pane,'Activate');
+% 
+%     % Identify current slide
+%     try
+%         currSlide = wind.Selection.SlideRange.SlideNumber;
+%         
+%         %In case the slideNumber
+%         
+%     catch
+%         % No slides - change  current to append if necessary
+%         if(strcmpi(myArg.defaultSlideNumber,'current'))
+%             myArg.defaultSlideNumber = 'append';
+%         end
+%     end
+% 
+%     % Select the slide to which the figure will be exported
+%     slide_count = int32(get(op.Slides,'Count'));
+%     
+%     
+%     if strcmpi(myArg.defaultSlideNumber,'append')
+%         slide = invoke(op.Slides,'Add',slide_count+1,11);
+%         shapes = get(slide,'Shapes');
+%         invoke(slide,'Select');
+%         invoke(shapes.Range,'Delete');
+%     else
+%         if strcmpi(myArg.defaultSlideNumber,'last')
+%             slideNum = slide_count;
+%         elseif strcmpi(myArg.defaultSlideNumber,'current');
+%             try
+%                 slideNum = get(wind.Selection.SlideRange,'SlideNumber');
+%             catch MyError
+%                 error('You have to add at least one slide first, or simply set SlideNumber to append in the call')
+%             end
+%         elseif ischar(myArg.defaultSlideNumber) 
+%             % We want to add the content "near" a slideTitle for this we
+%             % have to get all SlideTitles and compare            
+%             
+%             slideNumberIndex = getSlideNumberByTitle(myArg,op,slide_count);
+%             
+%             myArg.defaultSlideNumber = slideNumberIndex;
+%             
+%             if strcmpi(myArg.defaultSlideAddMethod,'insert')
+%                 slideNum = myArg.defaultSlideNumber+1; % +1 because we want to add AFTER the desired title slide
+%             else
+%                 slideNum = myArg.defaultSlideNumber;
+%             end
+%             
+%         else
+%             slideNum = myArg.defaultSlideNumber;
+%         end
+%         
+%         
+%         %% This will add empty slides in case the user wants to add content to an non existing slideNumber
+%         if isnumeric(slideNum)
+%             if slide_count<slideNum %% There are not enough slides => add dummy slides
+%                 for ii=1:(slideNum-slide_count)
+%                     slide = invoke(op.Slides,'Add',slide_count+ii,11);
+%                     shapes = get(slide,'Shapes');
+%                     invoke(slide,'Select');
+%                     invoke(shapes.Range,'Delete');
+%                 end
+%             else 
+% 
+%             % Insert new slide - content will be insert later
+%             
+%             if strcmpi(myArg.defaultSlideAddMethod,'insert')
+%                 
+%                 slide = invoke(op.Slides,'Add',slideNum,11);
+%                 shapes = get(slide,'Shapes');
+%                 invoke(slide,'Select');
+%                 invoke(shapes.Range,'Delete'); 
+%                 
+%             end
+%         
+%             % Update content to existing slide  
+%             % Do nothing here   
+%                 
+%             end
+%         
+%         
+% 
+%         end
+%         
+%         slide = op.Slides.Item(slideNum);
+%         invoke(slide,'Select');
+%     end
 
-    % Identify current slide
-    try
-        currSlide = wind.Selection.SlideRange.SlideNumber;
-        
-        %In case the slideNumber
-        
-    catch
-        % No slides - change append to current if necessary
-        if(strcmpi(myArg.defaultSlideNumber,'current'))
-            myArg.defaultSlideNumber = 'append';
-        end
-    end
-
-    % Select the slide to which the figure will be exported
-    slide_count = int32(get(op.Slides,'Count'));
-    
-    
-    if strcmpi(myArg.defaultSlideNumber,'append')
-        slide = invoke(op.Slides,'Add',slide_count+1,11);
-        shapes = get(slide,'Shapes');
-        invoke(slide,'Select');
-        invoke(shapes.Range,'Delete');
-    else
-        if strcmpi(myArg.defaultSlideNumber,'last')
-            slideNum = slide_count;
-        elseif strcmpi(myArg.defaultSlideNumber,'current');
-            try
-                slideNum = get(wind.Selection.SlideRange,'SlideNumber');
-            catch MyError
-                error('You have to add at least one slide first, or simply set SlideNumber to append in the call')
-            end
-        elseif ischar(myArg.defaultSlideNumber) 
-            % We want to add the content "near" a slideTitle for this we
-            % have to get all SlideTitles and compare            
-            
-            slideNumberIndex = getSlideNumberByTitle(myArg,op,slide_count);
-            
-            myArg.defaultSlideNumber = slideNumberIndex;
-            
-            if strcmpi(myArg.defaultSlideAddMethod,'insert')
-                slideNum = myArg.defaultSlideNumber+1; % +1 because we want to add AFTER the desired title slide
-            else
-                slideNum = myArg.defaultSlideNumber;
-            end
-            
-        else
-            slideNum = myArg.defaultSlideNumber;
-        end
-        
-        
-        %% This will add empty slides in case the user wants to add content to an non existing slideNumber
-        if isnumeric(slideNum)
-            if slide_count<slideNum %% There are not enough slides => add dummy slides
-                for ii=1:(slideNum-slide_count)
-                    slide = invoke(op.Slides,'Add',slide_count+ii,11);
-                    shapes = get(slide,'Shapes');
-                    invoke(slide,'Select');
-                    invoke(shapes.Range,'Delete');
-                end
-            else 
-
-            % Insert new slide - content will be insert later
-            
-            if strcmpi(myArg.defaultSlideAddMethod,'insert')
-                
-                slide = invoke(op.Slides,'Add',slideNum,11);
-                shapes = get(slide,'Shapes');
-                invoke(slide,'Select');
-                invoke(shapes.Range,'Delete'); 
-                
-            end
-        
-            % Update content to existing slide  
-            % Do nothing here   
-                
-            end
-        
-        
-
-        end
-        
-        slide = op.Slides.Item(slideNum);
-        invoke(slide,'Select');
-    end
-
+    [slide,~] = translateSlideNumberInformation2Slide(myArg,ppt,op,1);
 
 
     %% Add some additional values
@@ -253,6 +254,12 @@ else %% We want to perform a gerneal Command like saving
         applyTemplate(myArg,op);
     end
     
+    
+    %% Add section
+    if myArg.doAddSection
+        addSection(myArg,ppt,op);
+    end
+    
 
     
     %% Saving presentation
@@ -288,36 +295,6 @@ end
 
 end
 
-
-%% Get slideNumber by Title
-function slideNumberIndex = getSlideNumberByTitle(myArg,op,slide_count)
-
-    titleStruct = cell(1,slide_count);
-    editDistanceArray = zeros(1,slide_count);
-
-    for ii=1:slide_count
-
-        try
-            titleStruct{ii} = get(op.Slides.Item(ii).Shapes.Title.TextFrame.TextRange,'Text');
-        catch % No title present
-            titleStruct{ii} = num2str(ii);
-        end
-
-        if numel(titleStruct{ii}) < numel(myArg.defaultSlideNumber)
-            editDistanceArray(ii) = EditDistance(titleStruct{ii},myArg.defaultSlideNumber);
-        else
-            editDistanceArray(ii) = EditDistance(titleStruct{ii},myArg.defaultSlideNumber(1:numel(myArg.defaultSlideNumber)));
-        end
-        %% If EditDistance is zero we are already done
-        if editDistanceArray(ii) == 0
-            break;
-        end
-
-    end
-
-    %% Identify slide
-    [~,slideNumberIndex] = min(editDistanceArray);
-end
 
 
 %% Close presentation
@@ -458,6 +435,70 @@ function setFirstSlideNumber(myArg,presentation)
 end
 
 
+% Adds a section
+function addSection(myArg,ppt,presentation)
+
+    userTitle = '';
+    defaultFirstSection = 'First section';
+
+    if ischar(myArg.userSection)
+        % We only have the section title we will add it after the current slide
+        userTitle = myArg.userSection;
+    end
+
+    if iscell(myArg.userSection)
+        if numel(myArg.userSection)==1
+             % We only have the section title we will add it after the current slide
+            if  ~ischar(myArg.userSection{1})
+                warning('First argument of section needs to be a title.');
+            else
+                userTitle = myArg.userSection{1};
+            end
+
+
+        elseif numel(myArg.userSection)==2
+
+            if  ~ischar(myArg.userSection{1})
+                warning('First argument of section needs to be a title.');
+            else
+                userTitle = myArg.userSection{1};
+            end
+
+
+        end
+    end
+
+
+% TODO translations of userPos to index
+%   toPPT(...,'SlideNumber','current') - adds your content to the active slide
+%   toPPT(...,'SlideNumber','append') - adds your content to a new slide.
+%   toPPT(...,'SlideNumber',3) - adds your content to slide 3. In case 3 is
+%           not already existing empty slide will be placed in between.
+%   toPPT(...,'SlideNumber','Title of another slide') - updates the slide
+%           with 'Title of another slide' with your content. Edit distances will be
+%           used so it is not highly sensitive to errors in the spelling of the slide title.
+%   toPPT(...,'SlideNumber','Title of another slide','SlideAddMethod','insert')
+%           Instead of updating a slide it appends a new slide after the
+%           selected slide.
+
+    [~,slideNum] = translateSlideNumberInformation2Slide(myArg,ppt,presentation,0);
+
+%%
+
+%     if presentation.SectionProperties.Count == 0 && slideNum>1
+%         presentation.SectionProperties.AddSection(1,defaultFirstSection);
+%     end
+
+    try
+        presentation.SectionProperties.AddBeforeSlide(slideNum,userTitle);
+    catch
+        warning('Section could not be added. Is the specified index or slide exisitng?');
+    end
+
+
+end
+
+
 %% Apply template
 function applyTemplate(myArg,presentation)
     try
@@ -472,6 +513,19 @@ end
 function savePPT(myArg,presentation)
 
     defaultExtension = 'pptx';
+    
+    if myArg.hasSavePassword
+        if ~ischar(myArg.savePassword)
+            if isnumeric(myArg.savePassword)
+                presentation.Password = num2str(myArg.savePassword);
+            else
+                warning('Saving presentation failed! Password needs to be character value or numerical value.');
+            end
+        else
+            presentation.Password = myArg.savePassword;
+        end
+    end
+    
 
     if(myArg.doSavePPTPath && myArg.doSavePPTFilename)
         
@@ -592,8 +646,11 @@ function myFormattedText = intperetHtml(myFormattedText,textRange,myArg)
     % knownCommands ALLWAYS have to have the length 3(opening tag) or 4 (closing tag)
     knownCommands = {{'<b>','</b>','<\b>'},{'<u>','</u>','<\u>'},{'<i>','</i>','<\i>'},{'<s>','</s>','<\s>'}};
     
+    %isSpecialCommand = [0,0,0,1]; % Does the knowCommand has some special attributes?
+    %knownSpecialCommandsAttributes = {{'s','color:','font-family:','font-size:'}}; % The first element of the structure is the known tag itsself without brackets
+
     isSpecialCommand = [0,0,0,1]; % Does the knowCommand has some special attributes?
-    knownSpecialCommandsAttributes = {{'s','color:','font-family:','font-size:'}}; % The first element of the structure is the known tag itsself without brackets
+    knownSpecialCommandsAttributes = {{'s','bg:','color:','font-family:','font-size:'}}; % The first element of the structure is the known tag itsself without brackets
 
     bStart = cell(1,5);
     bStop = cell(1,5);
@@ -796,6 +853,13 @@ function assignStyleToTextElement(textRange,rangeStart,rangeStop,currentAttribut
         currentValue = currentAttributeCell{ii}{2}{1};
         
             switch currentAttribute
+                case 'bg:'
+                    try
+                        set(textRange.Parent.Parent.Fill.ForeColor,'RGB',rgb(currentValue,'ppt'))
+                    catch
+                        error(['An error occured when setting the bg-Color: ',currentValue,' only names are allowed (red, etc.) and hex values in the form #hexnumber']);
+                    end
+                
                 case 'color:'
                     % the value for color can be a hexnumber or a stringvalue
                     % (like red, blue etc.) but we will have to transform it to
@@ -901,7 +965,7 @@ function addComment(myArg,slide,op)
 
 
 % Set cmtNew = sldNew.Comments.Add(Left:=12, Top:=12, _Author:="Jeff Smith", AuthorInitials:="JS", _
-% 
+%
 %         Text:="You might consider reviewing the new specs" & _"for more up-to-date information.")
 
 if  iscell(myArg.comment)
@@ -910,19 +974,23 @@ if  iscell(myArg.comment)
         curAutohorIn   = myArg.comment{2};
         curTextComment = myArg.comment{3};
     elseif numel(myArg.comment) == 1
-       curAutohor     = 'Powerpoint Author';
-       curAutohorIn   = 'PA';
-       curTextComment = myArg.comment{1}; 
+        curAutohor     = 'Powerpoint Author';
+        curAutohorIn   = 'PA';
+        curTextComment = myArg.comment{1};
     end
 elseif ischar(myArg.comment)
-     curAutohor     = 'Powerpoint Author';
-     curAutohorIn   = 'PA';
-     curTextComment = myArg.comment;
+    curAutohor     = 'Powerpoint Author';
+    curAutohorIn   = 'PA';
+    curTextComment = myArg.comment;
 end
 
-slide.Comments.Add(myArg.userLeft,myArg.userTop,curAutohor,curAutohorIn,curTextComment);
+try
+    slide.Comments.Add(myArg.userLeft,myArg.userTop,curAutohor,curAutohorIn,curTextComment);
+catch
+    warning('Error adding a comment: You have to specify a cell of {Author,Author Initiales, Comment} or only Comment.');
+end
 
-display('here');
+
 
 end
 
@@ -942,6 +1010,15 @@ function setTable(myArg,slide)
     for ii=1:pptTableObject.rowCount
         for jj=1:pptTableObject.colCount
             set(myNewTable.Table.Cell(ii, jj).Shape.TextFrame.TextRange,'Text',pptTableObject.myCellTable{ii,jj});
+
+            intperetHtml(toLinebreakVersion(pptTableObject.myCellTable{ii,jj}),myNewTable.Table.Cell(ii, jj).Shape.TextFrame.TextRange,myArg);
+            
+            % Set color of cell
+            
+            %set(myNewTable.Table.Cell(ii, jj).Shape.Fill.ForeColor,'RGB',rgb('orange','ppt'))
+            
+            
+            
         end
     end
     
