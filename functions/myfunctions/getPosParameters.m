@@ -1,4 +1,23 @@
 function posStructure = getPosParameters(rawPos)
+% Parameter 'posAnker' (for use togehter with 'pos' or 'pos%'):
+% ---------------
+%   The position anker is defining which corner of the figure to be
+%   exported by toPPT should match to the specified position (via 'pos' or
+%   'pos%'). The default anker point of each figure is its center.
+%
+%   Possible values are:
+%    'NW' => North-west
+%    'N'  => North
+%    'NE' => North-east
+%    'W'  => West
+%    'C'  => Center
+%    'E'  => East
+%    'SW' => South-west
+%    'S'  => South
+%    'SE' => South-east
+%
+%
+%
 % Different methods for positioning objects in a slide:
 % =====================================================
 %
@@ -34,7 +53,7 @@ function posStructure = getPosParameters(rawPos)
 % SH - SouthHalf = SEH + SWH
 % W  - West   = NW + MW + SW
 % E  - East   = NE + ME + SE
-% C - Centred - eq. all tiles together - object will be centred in tile
+% C - Centred - eq. all tiles together - object will be centered in tile
 % C = N + M + S
 
 % All other combinations can be done by e.g. MyCombination = 'N + M'
@@ -259,14 +278,24 @@ function posStructure = getObjectParametersPositionNumeric(rawPos)
     myPresentationHeight          = rawPos.myPresentationHeight;
     
     % For text adding
-    if isempty(height)
-        height = myPresentationHeight/2;
+    if rawPos.pptOutputVersion == 3 % Text
+        if isempty(height) && ~heightPercentageByUser
+            height = myPresentationHeight/2;
+        end
+
+        if isempty(width) && ~widthPercentageByUser
+            width = myPresentationWidth/2;
+        end
+        
+        if isempty(height) && heightPercentageByUser
+            height = myPresentationHeight*defaultHeightPercentage/100;
+        end
+
+        if isempty(width) && widthPercentageByUser
+            width = myPresentationWidth*defaultWidthPercentage/100;
+        end
+        
     end
-    
-    if isempty(width)
-        width = myPresentationWidth/2;
-    end
-    
     
     if numel(rawPos.stringPos)==2
         posX = rawPos.stringPos(1);

@@ -1,4 +1,4 @@
-% toPPT-2 by Jens Richter 
+% toPPT-2.1 by Jens Richter 
 % email: jrichter@iph.rwth-aachen.de
 %
 % The following help describes the parameters in the order they appear in
@@ -7,23 +7,44 @@
 % Available inputs for toPPT(input):
 % ==================================
 %
-% Paramter 'setTitle':
+% Parameter 'setTitle':
 % ---------------
 %   toPPT('setTitle','Your title') - adds a title to your slide
 %
 %
 % Input figure:
 % ---------------
-%   toPPT(figure) -  adds a figure with default settings to a new pptslide.
+%   toPPT(figure) -  adds a figure with default settings to a new slide.
 %           By default figures are added in png-format to a new slide.    
 %
 %
-% Paramter 'pos':
+% Parameter 'pos' and 'pos%':
 % ---------------
 %   toPPT(figure,'pos','NEH') - adds a figure to NorthEastHalf position of
 %           a new slide.
 %           => Use 'help getPosParameters' for all available positions.
 %
+%   Additionally the 'pos' parameter also accepts numerical arrays of two 
+%   values where the first value is indicating the x-position in pixel and 
+%   the second value is indicating the position in y-position.
+%   The parameter 'pos%' ONLY accepts numerical arrays of two 
+%   values. Where the first value is indicating a x-position in percentage 
+%   (calculated from the current width of the presentation slides) and 
+%   the second value is indicating a position in y-position in percentage
+%   (calculated from the current height of the presentation slides).
+%
+%   Example:
+%   toPPT(figure,'pos%',[50,70])
+%   toPPT(figure,'pos',[250,350])
+%
+% Parameter 'posAnker' (for use togehter with 'pos' or 'pos%'):
+% ---------------
+%   The position anker is defining which corner of the figure to be
+%   exported by toPPT should match to the specified position (via 'pos' or
+%   'pos%'). The default anker point of each figure is its center.
+%
+%   => Use 'help getPosParameters' for all available positions.
+% 
 %
 % Parameter 'SlideNumber' and 'SlideAddMethod':
 % ---------------
@@ -37,6 +58,15 @@
 %   toPPT(...,'SlideNumber','Title of another slide','SlideAddMethod','insert')
 %           Instead of updating a slide it appends a new slide after the
 %           selected slide.
+%
+%
+% Parameter 'existingFigure':
+% ---------------
+%   Loads an exiting figure. Can be combined with all other commands. The 
+%   path can be defined relative or absolute.
+%
+%   Example:
+%   toPPT('existingFigure','C:\myFig.fig');
 %
 %
 % Input 'Your Text String':
@@ -61,6 +91,8 @@
 %
 % Input '<b>Your Text String with css tags </b>':
 % ---------------
+%   UPDATE: Each cell of a table can accept s-tags and TeX!
+%
 % 	toPPT('<b>Your Text String with css tags </b>') - it is possible to use
 %       css tags to change color, font, size etc. of text.
 %       => Use 'help addText' for all available options.
@@ -85,6 +117,9 @@
 %
 % Parameter 'setTable'
 % ---------------
+%   UPDATE: Each cell can accept s-tags and TeX! 
+%   => Use 'help addText' for all available options.
+%
 %   toPPT('setTable',{stringCellTableCaption, matrix or Vector or cell})
 % 
 %   Examples -  adding tables with different input:
@@ -122,12 +157,12 @@
 %
 % Parameter 'Height', 'Height%','Width', 'Width%':
 % ---------------
-%   The parameters Widht and Height are referring to absolute dimensions in pixels.
-%   The parameters Widht% and Height% are referring to relative dimensions in
+%   The parameters Width and Height are referring to absolute dimensions in pixels.
+%   The parameters Width% and Height% are referring to relative dimensions in
 %   percentage of the tile the figure will be placed in. If the tile is
 %   bigger the image will be bigger to in contrast of placing a figure in a
 %   smaller tile with the same Width% and Height% settings. If only one of
-%   the paramters Widht(%) or Height(%) is set the aspect ratio of the
+%   the parameters Width(%) or Height(%) is set the aspect ratio of the
 %   figure is persisted.
 %
 %   Examples:
@@ -182,6 +217,64 @@
 %   Example:
 %   toPPT(figure,'format','vec') - adds a figure to a new slide in vector
 %   format.
+%
+% Parameter 'addSection':
+% ---------------
+%   This parameter is defined for adding sections to the active
+%   presentation. For adding sections 'SlideAddMethod' also accepts 'before'
+%   and 'after' as argument.
+%
+%   Example:
+%   toPPT('addSection','My first section','SlideNumber',3,'SlideAddMethod','before');
+%   - will add a section called "My first section" in front of slide 3.
+%   
+%
+% Parameter 'asComment':
+% ---------------
+%   For adding comments to the active slide use:
+%
+%   Example:
+%   toPPT('asComment',{'Your Name','Your initials','Your comment'});
+%
+%
+% Parameter 'setPageOrientation' and 'setPageFormat':
+% ---------------
+%   The parameter setPageOrientation is used to set the presentation to
+%   'landscape', 'portrait' or 'invert' (this is just inverting the current
+%   orientation).
+%
+%   Example:
+%   toPPT('setPageOrientation','landscape');
+%
+%   The parameter setPageFormat is used to define the desired format e.g.
+%   16:9. Possible values are '4:3','16:9','16:10','Letter','Ledger',
+%   'A3','A4','B4' and 'B5'.
+%
+%   Example:
+%   toPPT('setPageFormat','16:10');
+%
+%   Annotation: It is recommended to use 'setPageOrientation' 
+%   and 'setPageFormat' before adding any content to your presentation.
+%
+% Parameter 'commandChain':
+% ---------------
+%   A commandChain can be executed as a chain of commands within an cell 
+%   array. CommandChains can be used to design a presentation e.g. within in other
+%   script file. The advantage is that no escaping is necessary and the
+%   presentation can be easily bundled.
+%
+%   Example:
+%   commandsCell{1} = {figure1,'Width%',50,'pos','ME'};
+%   commandsCell{2} = {{'Text1','Text2','Text3'}};
+%   commandsCell{3} = {'setTitle','Example using commandChains'};
+% 
+%   for ii=1:numel(commandsCell)
+%     toPPT('commandChain',commandsCell{ii});
+%   end
+%
+%   Annotation: In practice big CommandChains can exhibit the available
+%   physical memory. Especially when a lot of figures are put into the
+%   commandChain.
 %
 %
 % Parameters for QR-Code generation:
@@ -278,6 +371,16 @@
 %   toPPT('applyTemplate',templatePath)
 %
 %
+% Parameter 'openExisting':
+% ---------------'',''C:\myPresentation.pptx''
+%   In case it is desired to add content to an already existing
+%   presentation this parameter can be used to load a presentation.
+%
+%   Example:
+%   toPPT('openExisting','C:\myDeeplyDesiredPresentation.pptx');
+%
+%   Annotation: Password protected presentation can NOT be loaded.
+%
 % Parameter 'savePath' and 'saveFilename':
 % ---------------
 %   There are three ways of saving
@@ -296,6 +399,19 @@
 %   savePath = pwd;
 %   saveFilename = 'My first presentation with toPPT';
 %   toPPT('savePath',savePath,'saveFilename',saveFilename) - saves the
+%   current presentation.
+%
+%
+% Parameter 'savePassword':
+% ---------------
+%   This parameter can be used for defining a password for the active
+%   presentation to be saved. This parameter can only be used together with
+%   the parameters 'savePath' and/or 'saveFilename':
+%
+%   Example:
+%   savePath = pwd;
+%   saveFilename = 'My first presentation with toPPT that is protected';
+%   toPPT('savePath',savePath,'saveFilename',saveFilename,'savePassword','mySecret') - saves the
 %   current presentation.
 %
 %
@@ -363,7 +479,7 @@ end
     
 
 if isCommandChain
-    % The argument (or second paramter of toPPT has all commands as cell => lets check that)
+    % The argument (or second parameter of toPPT has all commands as cell => lets check that)
     if iscell(commandChain)
         % Only one argument and the argument is a cell itself
         
@@ -405,6 +521,15 @@ textAsQRCode = 0; % By default we do NOT want to translate text in QR-Code
 structMyArgument         = deleteFromArgumentAndGetValue(varargin,'TextAsQR');
 if ~isempty(structMyArgument.value)
     textAsQRCode        = structMyArgument.value;
+    varargin            = structMyArgument.arguments;
+end
+
+asExistingFigure = 0; % By default we do not want to load an existing figure
+
+structMyArgument         = deleteFromArgumentAndGetValue(varargin,'existingFigure');
+if ~isempty(structMyArgument.value)
+    figurePath2Load     = structMyArgument.value;
+    asExistingFigure    = 1;
     varargin            = structMyArgument.arguments;
 end
 
@@ -560,6 +685,26 @@ if textAsQRCode
     
 end
 
+if asExistingFigure
+    
+    try
+        % Load figure
+        loadedfig = openfig(figurePath2Load);
+        varargin{1} = loadedfig;
+    catch
+        
+        % Check if figure is existing
+        isExistingFigure = isequal(exist(figurePath2Load),2);
+        
+        if isExistingFigure
+            warning(['An error occured loading: ',figurePath2Load,'. The file is existing but can not be opened?!']);
+        else
+            warning(['An error occured loading: ',figurePath2Load,'. The file is not existing or not readable -  Right path? An active presentation will be used instead. If there is no active presentation a new one will be created.']);
+        end
+    end
+    
+end
+
 
 
 pptOutputVersion    = 2; % Output 1 = editable graphic , 2 = png image (default), 3 = text
@@ -700,6 +845,8 @@ if pptOutputVersion == 2
     myArgumentsImagePNG = toPPT_conifg('toPPTFigurePNG');
     
     %%Overwrite values (if existing) with user input
+    myArgumentsImagePNG.pptOutputVersion = pptOutputVersion;
+    
     myArgumentsImagePNG = getValuesFromArgument(myArgumentsImagePNG,vararginStructure,'png');
     
 
@@ -711,6 +858,8 @@ if pptOutputVersion == 1
 
     myArgumentsImageVEC = toPPT_conifg('toPPTFigureVEC');
     
+    myArgumentsImageVEC.pptOutputVersion = pptOutputVersion;
+    
     %%Overwrite values (if existing) with user input
     myArgumentsImageVEC = getValuesFromArgument(myArgumentsImageVEC,vararginStructure,'vec');
 end
@@ -718,6 +867,8 @@ end
 if pptOutputVersion == 3
     
     myArgumentsText = toPPT_conifg('toPPTText');
+    
+    myArgumentsText.pptOutputVersion = pptOutputVersion;
 
     %%Overwrite values (if existing) with user input
     myArgumentsText = getValuesFromArgument(myArgumentsText,vararginStructure,'text');

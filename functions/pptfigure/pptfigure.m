@@ -1337,12 +1337,18 @@ for obj = length(objects):-1:1
             if strcmp(type,'text')
                 for c = 3:pic.Count
                     if strcmp(get(pic.Item(c),'HasTextFrame'),'msoTrue')
+                        
+                        try %% This try is neccessary for Matlab 2015 => It solves the problem but I have no clue why it is working
                         str = get(pic.Item(c).TextFrame.TextRange,'Text');
+                        
+                        
                         if strcmp(str,txtString)
                             ndx = c;
                             txthands{end+1} = pic.Item(c); %#ok<AGROW>
                         else
                             invoke(pic.Item(c),'Delete');
+                        end
+                        catch
                         end
                     else
                         invoke(pic.Item(c),'Delete');

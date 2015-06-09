@@ -26,7 +26,7 @@ function [slide,slideNum] = translateSlideNumberInformation2Slide(myArg,ppt,op,d
     % Select the slide to which the figure will be exported
     slide_count = int32(get(op.Slides,'Count'));
     
-    
+    blockIncrease = 0;
     if strcmpi(myArg.defaultSlideNumber,'append')
         
         slideNum = slide_count+1;
@@ -59,6 +59,7 @@ function [slide,slideNum] = translateSlideNumberInformation2Slide(myArg,ppt,op,d
             
             if strcmpi(myArg.defaultSlideAddMethod,'insert') || strcmpi(myArg.defaultSlideAddMethod,'after')
                 slideNum = myArg.defaultSlideNumber+1; % +1 because we want to add AFTER the desired title slide
+                blockIncrease = 1;
             elseif strcmpi(myArg.defaultSlideAddMethod,'update') || strcmpi(myArg.defaultSlideAddMethod,'before')
                 slideNum = myArg.defaultSlideNumber;
             else
@@ -75,7 +76,9 @@ function [slide,slideNum] = translateSlideNumberInformation2Slide(myArg,ppt,op,d
             
             
             if strcmpi(myArg.defaultSlideAddMethod,'insert') || strcmpi(myArg.defaultSlideAddMethod,'after')
-                slideNum = slideNum+1; % +1 because we want to add AFTER the desired title slide
+                if ~blockIncrease
+                    slideNum = slideNum+1; % +1 because we want to add AFTER the desired title slide
+                end
             elseif strcmpi(myArg.defaultSlideAddMethod,'update') || strcmpi(myArg.defaultSlideAddMethod,'before')
                 %slideNum = myArg.defaultSlideNumber;
             else

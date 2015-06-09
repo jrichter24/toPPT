@@ -1,53 +1,5 @@
 function desiredProperty = toPPT_conifg(identifierProperty)
 
-    % Before next release (toPPT2.1) try to finish:
-
-    % Documentation
-    
-    % Another look on hyperlinks
-    
-    % Todo add export icon to figures
-    
-    % Comments and (replies no) DONE
-    
-    % Add video audio objects
-    
-    % Animations - Transistions between slides
-    
-    % Start slidshow
-    
-    % Select language - translate - spelling
-    
-    % Connect elements with arrows
-    
-    % Improve postioning of graphs and texts by pixel/percentage position DONE
-    
-    % Add notes to certain slides
-    % Notes: op.NotesMaster.HeadersFooters.Footer.Text = 'Volcano Coffee'
-    
-    % Bundle slides to sections DONE
-    
-    % Correct pptfigure for matlab 2015a again :-(
-    
-    % Make toPPT accept cells with commands. E.g.
-    % toPPT('commandChain',{SomeCommands}) DONE
-    % The advantage is that no escaping of characters is necessary
-    
-    % Load presentation DONE
-    
-    % Start presentation form certain number DONE
-    
-    % Change format and orientation of presentation DONE
-    
-    % Password encryption - Protect DONE
-    
-    % Update qr code quietzone setting
-    
-    % Tables can use css tags and TEx DONE
-
-    % Tables and normal texxt can use new css tag bg for bacground color DONE
-
-
 
     %% Default properties for adding figures
     toPPTFigure.defaultSlideNumber       = 'append';                        %% User can change value
@@ -92,7 +44,8 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     
     %toPPTText.pageFormat                = '4:3'; % Available values would be 4:3, 16:9 and so on
     toPPTText.knownPageFormats          = {  '4:3',  '16:9', '16:10', 'Letter','Ledger', 'A3',    'A4',       'B4',      'B5'}; % Title of the format
-    toPPTText.knownPageFormatsDesc      = {[10,7.5],[10,5.6],[10,6.2],[8.5,11],[17,11],[14,10.5],[10.8,7.5],[11.8,8.9],[7.8,5.9]} ; % Size of format in the same oder as the title in inch (width,height)
+    toPPTText.pageFormatscalingFactor   = 4/3;   % This especially kicks in for PowerPoint2013 => is 1 for PowerPoint2010        
+    toPPTText.knownPageFormatsDesc      = {[10,7.5]*toPPTText.pageFormatscalingFactor,[10,5.6]*toPPTText.pageFormatscalingFactor,[10,6.2]*toPPTText.pageFormatscalingFactor,[8.5,11]*toPPTText.pageFormatscalingFactor,[17,11]*toPPTText.pageFormatscalingFactor,[14,10.5]*toPPTText.pageFormatscalingFactor,[10.8,7.5]*toPPTText.pageFormatscalingFactor,[11.8,8.9]*toPPTText.pageFormatscalingFactor,[7.8,5.9]*toPPTText.pageFormatscalingFactor} ; % Size of format in the same oder as the title in inch (width,height)
     
     %toPPTText.pageOrientation           = 'landscape'; 
     toPPTText.knownPageOrientations     = {'landscape','portrait','invert'}; % invert means that the current orientation is switched e.g from landscape to portrait or vice versa

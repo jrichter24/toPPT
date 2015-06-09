@@ -1,7 +1,7 @@
-%% toPPT-2:
+%% toPPT-2.1:
 % * Author :  Jens Richter
 % * eMail  :  jrichter@iph.rwth-aachen.de
-% * Date   :  28 February 2015
+% * Date   :  9th of June 2015
 
 
 %% Adds all files of toPPT to matlab path
@@ -14,9 +14,23 @@ cd(pathstr1);
 clear pathstr1 fullpath;
 
 
+%% Latest release notes (09 June 2015):
+% * toPPT works together with *Matlab 2015a* and *Office 2013* (targeted system configuration).
+% * Minor bug fixes.
+% * Adding comments on slides.
+% * Additional positioning system for figures and texts by pixel/percentage.
+% * Minor changes in pptfigure to make it work together with *Matlab 2015a*
+% * Adding of PowerPoint sections was introduced.
+% * Possibility of using commandChains was added.
+% * Load existing presentation and go on from arbitrary slide.
+% * Change format and orientation of presentation.
+% * Setting passwords when saving presentations.
+% * Tables can use css tags and TeX.
+% * Already existing fig-files can be used together with toPPT.
 
-%% Latest release notes:
-% * toPPT works together with *Matlab 2014b* and *Office 2013*.
+
+%% Older release nodes (28 February 2015):
+% * toPPT works together with *Matlab 2014a* and *Office 2013*.
 % * Minor bug fixes.
 % * Added QR code ability.
 % * Major changes in pptfigure to make it work together with *Office 2013*
@@ -25,7 +39,7 @@ clear pathstr1 fullpath;
 % * Updated used version of export_fig to to version published at 28 Feb 2015
 
 %% Short description of toPPT:
-% *toPPT* is a powerful tool for generating PowerPoint  presentations
+% *toPPT* is a powerful tool for generating PowerPoint presentations
 % programmatically defined in matlab.
 % It will use different scripts to perform exports of figures,
 % tables and texts. For this purpose it will use scripts written
@@ -66,6 +80,14 @@ clear pathstr1 fullpath;
 % we will use a little subscript _example_helper.m_ to create dummy figures.
 
 
+%% BASIC COMMANDS
+%
+%% Preparation:
+% This example presentation is optimized for a page format of 16:9.
+% Refer to *Example 12* for more information.
+toPPT('setPageFormat','16:9');
+
+
 %% Example 1 - Adding a figure:
 % The challenge is to place an image in png format centred in your
 % presentation.
@@ -73,8 +95,8 @@ clear pathstr1 fullpath;
 % content. If PowerPoint is closed it will open it and create a blank presentation.
  
 figure1 = example_helper(1); %Gets a figure
-
 toPPT(figure1); % By default a new slide is created when adding a figure
+
 
 %% Example 2 - Setting a title:
 % We want to add a title to the slide of Example 1.
@@ -87,7 +109,7 @@ toPPT('setTitle','My first figure with toPPT-beta1, Example 1-2');
 % of the presentation and one image to the lower half _(SouthEastHalf)_ of the image.
 % For detailed information use *'help getPosParameters'*.
 
-figure1 = example_helper(1);
+
 figure2 = example_helper(2);
 
 toPPT(figure1,'pos','NEH'); % NEH = NorthEastHalf
@@ -95,22 +117,97 @@ toPPT(figure2,'pos','SEH','SlideNumber','current'); % NEH = SouthEastHalf
 
 toPPT('setTitle','Example 3a - Adding a figure at a certain position');
 
+%% Example 3b - Changing the height and width of a figure:
+% We want to add an image to the middle tile of the slide and stretch it to 100% of the
+% width.
+% We also want to add another image and stretch it to 200px in height
+% which will be placed in the _Middle East_.
 
 
-%% Example 3b - Adding a text with a bullet point:
+toPPT(figure1,'pos','M','Width%',100,'Height%',100);
+toPPT('setTitle','Example 3b - Defining the height and width of a figure in percentage');
+
+toPPT(figure1,'pos','ME','Height',200,'Width',100); % ME = MiddelEast
+toPPT('setTitle','Example 3b - Defining the height and width of a figure in pixel');
+
+
+%% Example 3c - Adding a figure at a certain position by specifying position in percentage:
+% We want to add an image in png format and specify the position by coordinates 
+% related to the dimension of the current presentation.
+% In addition we specify a 'posAnker'. This means the point specified by
+% 'pos%' is the anker point of the current image. In case only 'pos' is
+% used (without %) together with an numerical array the values assumed to
+% be pixel coordinates.
+% For detailed information use *'help getPosParameters'* and *'help toPPT'*.
+
+
+posPercentageX = 75; % 75% of the width of the current presentation
+posPercentageY = 55; % 55% of the height of the current presentation
+toPPT(figure1,'pos%',[posPercentageX,posPercentageY],'Height%',30,'posAnker','NW');
+toPPT(figure2,'pos%',[posPercentageX,posPercentageY],'Height%',30,'posAnker','SW','SlideNumber','current');
+toPPT(figure2,'pos%',[20,55],'Width%',30,'posAnker','C','SlideNumber','current');
+
+% When specifying Width and Height the aspect ratio is not necessarily kept
+toPPT(figure1,'pos%',[55,55],'Height%',40,'Width%',20,'posAnker','C','SlideNumber','current'); 
+
+toPPT('setTitle','Example 3c - Adding a figure at a certain position by specifying position in pixel or percentage');
+
+%
+posPixelX = 20;
+posPixelY = 300;
+toPPT(figure1,'pos',[posPixelX,posPixelY],'Height%',30,'posAnker','NW');
+toPPT(figure2,'pos',[posPixelX+200,posPixelY],'Height',200,'posAnker','NW','SlideNumber','current');
+toPPT(figure2,'pos',[posPixelX+500,posPixelY],'Height%',40,'posAnker','NW','SlideNumber','current');
+toPPT(figure1,'pos',[posPixelX+500,posPixelY],'Width%',20,'posAnker','SW','SlideNumber','current');
+toPPT(figure1,'pos',[posPixelX,posPixelY],'Height%',15,'Width%',20,'posAnker','SW','SlideNumber','current');
+
+toPPT('setTitle','Example 3c - Adding a figure at a certain position by specifying position in pixel or percentage');
+
+
+%% Example 3d - Adding an existing figure:
+% The challenge is to load an existing figure and add it to our
+% presentation. The path can be defined relative or absolute.
+
+figPath = [pwd,'\testLoadMe.fig'];
+toPPT('existingFigure',figPath); % By default a new slide is created when adding a figure
+
+toPPT('setTitle','Example 3d - Adding an existing figure');
+
+
+%% Example 3e  - Changing the padding/gap of the active placing area of the slide:
+% We want to change the default gap between our centered tile in the North and in 
+% the West/East. 
+
+
+toPPT(figure1,'gapN',200,'gapWE',150);
+toPPT('setTitle','Example 8a  - Changing the padding/gap of the active placing area of the slide');
+
+%% Example 3f - Change the 'dividing' of the slide:
+% We want to change the divide property of the tiles - by default each
+% image is stretched to 100% of the tile height by keeping the aspect
+% ratio. For more information see *'help toPPT'*.
+
+
+toPPT(figure1,'pos','E','Width%',60,'divide',30);
+toPPT(figure2,'pos','W','SlideNumber','current','Width%',60,'divide',30);
+toPPT('setTitle','Example 8b - Change the dividing of the slide');
+
+
+
+%% Example 4 - Adding a text with a bullet point:
 % We want to set a title and add a text as a bullet point.
-% *By default text is added centred to the current slide as a bullet point*
-% (Refers to the comment _'SlideNumber','current'_).
+% *By default text is added centered to the current slide as a bullet point*
+% (Refers to the command _'SlideNumber','current'_).
 % *Remember: By default figures are added to a new slide*
-% (Refers to the comment _'SlideNumber','append'_).
+% (Refers to the command _'SlideNumber','append'_).
 
 toPPT('My first bullet item','pos','W','SlideNumber','append'); % We want to add it to the W = West
-toPPT('setTitle','Example 3b - Adding a text with a bullet point');
+toPPT('setTitle','Example 4 - Adding a text with a bullet point');
 
 
 %% Example 4a - Adding a text with a bullet point to a new slide:
 % We want to add a list of texts with bullet points to a *NEW* slide. 
-% *It is important to put the list into an cellaray {}.*
+% *It is important to put the list into a cell aray {}.*
 
 toPPT({'Text1','Text2','Text3'},'SlideNumber','append');
 toPPT('setTitle','Example 4a - Adding a text with a bullet point to a new slide');
@@ -135,13 +232,15 @@ toPPT('setTitle','Example 4c - Applying bold, underlined and italic to text elem
 % our texts.
 % Have a look on _*'toPPT accepts the following predefined colors'*_ in this example-file for a list of all known colors.
 
-toPPT({'<s color:red>Red text,</s> Black text, <s color:blue>Blue text</s>','<s font-family:Times New Roman>Using Times New Roman</s>','<s font-size:40>BIG</s>'},'SlideNumber','append');
+toPPT({'<s color:red>Red text,</s> Black text, <s color:blue>Blue text</s>','<s font-family:Times New Roman>Using Times New Roman</s>','<s font-size:40>BIG</s>'},'SlideNumber',...
+    'append');
 toPPT('setTitle','Example 4d - Changing the color, size and font of text elements (css-tags)');
 
 %% Example 4e - Changing the color, size and font and apply bold, underlined and italic to text elements:
 % Now we want to combine different tags (<s>,<u>...) together.
 
-toPPT({'<s color:green; font-size:36; font-family:Aharoni>Mixed One</s>','<i><u><b><s font-family:Times New Roman>Bold, underlined,italic and Times</s></b></u></i>'},'SlideNumber','append');
+toPPT({'<s color:green; font-size:36; font-family:Aharoni>Mixed One</s>','<i><u><b><s font-family:Times New Roman>Bold, underlined,italic and Times</s></b></u></i>'},...
+    'SlideNumber','append');
 toPPT('setTitle','Example 4e - Changing color, size and font and apply bold, underlined and italic');
 
 %% Example 4f -  Using Hex-Code for defining the color of a text element:
@@ -151,18 +250,20 @@ toPPT('setTitle','Example 4e - Changing color, size and font and apply bold, und
 % language. It is absolutely necessary that each argument within the *s*-tag is
 % closed via ";" (for the last argument the |>| works as closing ";")
 
-toPPT('<s color:#5F9EA0; font-size:22; font-family:Aharoni>CadetBlue</s> meets <s color:#FFA07A; font-size:22; font-family:Aharoni>LightSalmon</s>','SlideNumber','append');
+toPPT('<s bg:yellow; color:#5F9EA0; font-size:22; font-family:Aharoni>CadetBlue</s> meets <s color:#FFA07A; font-size:22; font-family:Aharoni>LightSalmon</s>',...
+    'SlideNumber','append');
 toPPT('setTitle','Example 4f -  Using Hex-Code for defining the color of a text element');
 
 
 %% Example 4 $\eta$ -  Using TeX in texts:
-% Now we want to show how the TeX interpreter works. In general the TeX
-% interpreter is turned on by default. Example 12 _*Saving a presentation*_ shows that it is sometimes
+% Now we want to inspect how the TeX interpreter works. In general the TeX
+% interpreter is turned on by default. Example 17 _*Saving a presentation*_ shows that it is sometimes
 % necessary to turn off the interpreter.
 % An overview of all possible TeX characters can be found in _*"toPPT accepts the following predefined TeX parameters"*_ in this example-file.
 % In general _TeX_ can be combined with all other css-tags.
 
-toPPT({'Lets start with something easy x = \sqrt\x^2','I like red formulas <s color:red>x = \sqrt\x^2<\s>', 'And big blue ones <i><b><s color:blue; font-size:40; font-family:Times New Roman>x = \sqrt\x^2<\s></b></i>'},'SlideNumber','append');
+toPPT({'Lets start with something easy x = \sqrt\x^2','I like red formulas <s color:red>x = \sqrt\x^2<\s>',...
+    'And big blue ones <i><b><s color:blue; font-size:40; font-family:Times New Roman>x = \sqrt\x^2<\s></b></i>'},'SlideNumber','append');
 toPPT('setTitle','Example 4 \eta -  Using TeX in texts');
 
 %% Example 4 $\gamma$ -  Using TeX and css-tags in texts at the same time:
@@ -183,40 +284,89 @@ toPPT('setTitle','Example 4 \gamma -  Using TeX and css-tags in texts at the sam
 myTexText = texlabel('lambda12^(3/2)/pi - pi*delta^(2/3)');
 
 toPPT(myTexText,'SlideNumber','append');
-toPPT(['<s bg:red; color:orange>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>'],'pos','NEH');
+toPPT(['<b><s bg:orange; color:green>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s><\b>'],'pos','NEH');
 toPPT({'TeX Interpreter is off:',['<s color:blue>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>']},'pos','SWH','TeX',0); % TeX interpreter turned off
 
 toPPT('setTitle','Example 4 \phi - Using TeX in texts together with matlab build in texlabel-function');
 
-%% Example 3c - Updating an existing slide identified by its title:
+
+%% Example 5a - Updating an existing slide identified by its title:
 % The parameter _SlideNumber_ can be used differently:
 %
 % * A slide can be found by its title.
 % * Even if the spelling is slightly wrong the slide can be found via edit distances.
-toPPT('New updated Text on Slide of Example 3a','SlideNumber','Example 3a - Adding a figure at a certain position','pos','SWH'); % Found by its title.
-toPPT('New updated Text on Slide of Example 3a without right spelling of title','SlideNumber','Axample 3a - bddinaag a figure at a cerdastain positiddd5on','pos','SW'); % Found by its title with wrong spelling.
 
-%% Example 3d - Inserting content after an existing slide identified by its title:
-%
+toPPT('<s color:blue>Check "Example 4f" for updated texts.<\s>','SlideNumber','append'),
+toPPT('setTitle','Example 5a - Updating an existing slide identified by its title');
+
+toPPT('<s color:blue>New updated Text on slide "Example 4f"<\s>','SlideNumber',...
+    'Example 4f -  Using Hex-Code for defining the color of a text element','pos%',[1,50],'setBullets',0); % Found by its title.
+
+toPPT('<s color:red>New updated Text on slide "Example 4f" with wrong spelling of title<\s>',...
+    'SlideNumber','Aaxmple 3f -  Uesin HeX-Kode for efining the cooulor of a text ele','pos%',[1,60],'setBullets',0,'Width%',90); % Found by its title with wrong spelling.
+
+%% Example 5b - Inserting content after an existing slide identified by its title:
 % The parameter _SlideAddMethod_ can be used to insert content after an
 % existing slide instead of updating the slide. *By default slides are
 % updated.*
-toPPT('New inserted Text after Slide of Example 3a','SlideNumber','Axample 3a - bddinaag a figure at a cerdastain positiddd5on','SlideAddMethod','insert','pos','NW'); % Inserting content after choosen slide
-toPPT('setTitle','Example 3d - Inserting content after an existing slide identified by its title');
 
-%% Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides):
-%
-toPPT('New inserted Text after slide Number 4','SlideNumber',4,'SlideAddMethod','insert','pos','NW'); % New slide will becomse slide 4
-toPPT('setTitle','Example 3e - Inserting content in a new slide at slide number 4 (will shift all following slides)');
+toPPT('<s color:blue>Check slide after "Example 4e" for inserted text.<\s>','SlideNumber','append'),
+toPPT('setTitle','Example 5b - Inserting content after an existing slide identified by its title');
 
-%% Example 3f - Updating an existing slide identified by its slide number:
-%
-toPPT('New updated Text in slide Number 4','SlideNumber',4,'pos','SW'); % Adds a new textbox to slide 4.
+toPPT('New inserted Text after Slide of Example 4e','SlideNumber','Example 4e - Changing color, size and font and apply bold, underlined and italic'...
+    ,'SlideAddMethod','insert','pos','NW'); % Inserting content after choosen slide
+
+toPPT('setTitle','Example 4eb - Inserting content after an existing slide identified by its title');
+
+%% Example 5c - Updating an existing slide identified by its slide number:
+
+toPPT('<s color:blue>Check first slide for updated text.<\s>','SlideNumber','append'),
+toPPT('setTitle','Example 5c - Updating an existing slide identified by its slide number');
+
+toPPT('<b><i><s font-family:Times New Roman;color:blue;font-size:30>Example toPPT() 2.1 by Jens Richter<\s><\i><\b>','SlideNumber',1,...
+    'setBullets',0,'Width%',25,'pos%',[1,50],'posAnker','NW'); % Adds a new textbox to slide 1.
+
+%% Example 5d - Inserting content in a new slide at slide number 4 (will shift all following slides):
+
+toPPT('<s color:blue>Check slide after slide 8 for inserted slide 9.<\s>','SlideNumber','append'),
+toPPT('setTitle','Example 5d - Inserting content in a new slide after slide number 8 (will shift all following slides)');
+
+toPPT('New inserted Text <b>AFTER</b> slide Number 8','SlideNumber',8,'SlideAddMethod','insert','pos','NW'); % New slide will become slide 9
+toPPT('setTitle','Example 5d - Inserting content in a new slide at slide number 4 (will shift all following slides)');
+
+
+%% Example 6 - Adding Sections
+% We want to add a section to our presentation. This can be used to subdivide
+% your presentation into different thematic sections.
+% For a list of all available parameters call *help toPPT*. 
+
+toPPT({'<b>Add a section for the basic commands!<\b>',...
+    '<b>Add a section for texts and tags.<\b>',...
+    '<b>Add a section for updating and inserting slides.<\b>',...
+    '<b>Add a section for Special commands.<\b>'},'SlideNumber','append');
+toPPT('setTitle','Example 6 - Adding Sections');
+
+toPPT('addSection','Basic commands','SlideNumber','My first figure with toPPT-beta1, Example 1-2','SlideAddMethod','before');
+toPPT('addSection','Texts, TeX and tags','SlideNumber','Example 4 - Adding a text with a bullet point','SlideAddMethod','before');
+toPPT('addSection','Inserting, updating slides','SlideNumber','Example 5a - Updating an existing slide identified by its title','SlideAddMethod','before');
+toPPT('addSection','Sections and Templates','SlideNumber','Example 6 - Adding sections to the presentation','SlideAddMethod','before');
 
 
 
-%% Example 5 - Adding Tables:
-% We want to create a new slide and add a centred table to this slide. In
+%% Example 7 - Applying a template to the active presentation:
+% Now we want to apply a template to our presentation. *The template file
+% path has to be absolute*.
+
+templatePath = [pwd,'\IPH Slides_EN.potx']; % The template path has to be absolute!
+toPPT('applyTemplate',templatePath);
+
+toPPT('<b>We applied a template!<\b>','SlideNumber','append');
+toPPT('setTitle','Example 7 - Applying a template to the active presentation');
+
+
+
+%% Example 8 - Adding Tables:
+% We want to create a new slide and add a centered table to this slide. In
 % addition we want to add two smaller tables on another slide positioned in the West and East.
 %
 % * All content for the table is put into cell arrays *(One cell for the captions and one cell/matrix etc. for the content)*. 
@@ -226,120 +376,132 @@ toPPT('New updated Text in slide Number 4','SlideNumber',4,'pos','SW'); % Adds a
 % * In general setTable accepts different arguments as Input:
 %
 % # *A two dimensional cell* that fully defines the desired cell *NOT* including the
-% captions. (5a)
+% captions. (8a)
 % # *Row or column vectors.* 
 % toPPT will automatically detect if it is a row or column vector by checking 
 % the number of caption entries. 
-% It is *NOT* possible to add row and column vectors at the same time. (5b)
-% # *A numeric matrix.* (5c)
+% It is *NOT* possible to add row and column vectors at the same time. (8b)
+% # *A numeric matrix.* (8c)
 %
 % The syntax is: *toPPT('setTable',{stringCellTableCaption, matrix/Vector/cell})*
+% UPDATE: Each cell can accept s-tags and TeX!
 
 helpTableCell      = cell(2,3);
 helpTableCell{1,1} = '<s bg:red; color:white><i>Me is first<\i><\s>';
-helpTableCell{1,2} = 'Example 4 \phi';
-helpTableCell{1,3} = ['<s color:orange>',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s>'];
+helpTableCell{1,2} = 'Me is second';
+helpTableCell{1,3} = ['<b><s color:orange>','Me is formula: ',texlabel('H(x)*psi(x)=E*psi(x)'),'<\s><\b>'];
 helpTableCell{2,1} = '<s color:#5F9EA0; font-size:22; font-family:Aharoni>Me is fourth</s>';
 helpTableCell{2,2} = 'Me is fifth';
 helpTableCell{2,3} = 'Me is sixth';
 
 % First slide -  It is important to add "helpTableCell" into an extra cell {}
-toPPT('setTable',{{'<s bg:red>Caption1<\s>','Caption2','Caption3'},{helpTableCell}},'SlideNumber','append','Width',300);
-toPPT('setTitle','Example 5a - Adding tables using cell of strings');
+toPPT('setTable',{{'<b>Caption1<\b>','<b>Caption2<\b>','<b>Caption3<\b>'},{helpTableCell}},'SlideNumber','append','Width',400,'Height',150,'pos%',[48,55],'posAnker','E');
 
 % Second slide - auto rotate will be used
-toPPT('setTable',{{'Caption1','Caption2'},{helpTableCell}},'SlideNumber','append');
-toPPT('setTitle','Example 5a - Adding tables using auto rotate');
+toPPT('setTable',{{'<b>Caption1<\b>','<b>Caption2<\b>'},{helpTableCell}},'SlideNumber','current','Width',400,'Height',150,'pos%',[52,55],'posAnker','W');
+toPPT('setTitle','Example 8a - Adding tables using cell of strings (right table is using auto rotate)');
 
 % Third slide - It is important to add all vectors into an extra cell {}
 helperVector1 = [1,2,3];
 helperVector2 = {'Me is 1','Me is 2','Me is 3'};
 
-toPPT('setTable',{{'Col 1','Col 2'},{helperVector1,helperVector2}},'SlideNumber','append','pos','E');
-toPPT('setTitle','Example 5b - Adding tables using vectors and cells mixed');
+toPPT('setTable',{{'Col 1','Col 2'},{helperVector1,helperVector2}},'SlideNumber','append','pos','ME');
 
 % With autorotation
-toPPT('setTable',{{'Col 1','Col 2','Col 3'},{helperVector1,helperVector2}},'SlideNumber','append','pos','E');
-toPPT('setTitle','Example 5b - Adding tables using auto rotate with vectors');
+toPPT('setTable',{{'Col 1','Col 2','Col 3'},{helperVector1,helperVector2}},'SlideNumber','current','pos','MW');
+toPPT('setTitle','Example 5b - Adding tables using vectors and cells mixed (right table is using auto rotate)');
 
 % Fourth slide
-toPPT('setTable',{{'Col 1','Col 2'},ones(2,2)},'SlideNumber','append','pos','E');
+toPPT('setTable',{{'Col 1','Col 2'},ones(2,2)},'SlideNumber','append','pos','E','Width',200,'Height',150);
 toPPT('setTable',{{'Col 1','Col 2'},ones(3,2)},'pos','W','Width',200,'Height',150);
 toPPT('setTitle','Example 5c - Adding tables using a matrix');
 
+%% Adding a section for tables
+toPPT('addSection','Tables','SlideNumber','Example 8a - Adding tables using cell of strings (right table is using auto rotate)','before');
 
-%% Example 6 - Deactivating toPPT temporally:
+%% Example 9 - Deactivating toPPT temporally:
 % Maybe we don't want to add something to the presentation all the time
 % because we are just testing our script...
-
-figure1 = example_helper(1);
 
 doPublishing = 0;
 toPPT(figure1,'pub',doPublishing); % Nothing happens
 
 doPublishing = 1;
 toPPT(figure1,'pub',doPublishing); % Now we publish
-toPPT('setTitle','Example 6 - Deactivating toPPT temporally and reactivating');
+toPPT('setTitle','Example 9 - Deactivating toPPT temporally and reactivating');
 
-%% Example 7 - Changing the height and width of a figure:
-% We want to add an image to the middle tile of the slide and stretch it to 100% of the
-% width.
-% We also want to add another image and stretch it to 200px in height
-% which will be placed in the _Middle East_.
+%% Adding a section for Special commands II
+toPPT('addSection','Special commands II','SlideNumber','Example 9 - Deactivating toPPT temporally and reactivating','before');
 
-figure1 = example_helper(1);
+%% Example 10 - Adding comments:
+% We want to add a comment.
+% For a list of all available parameters call *help toPPT*. 
 
-toPPT(figure1,'pos','M','Width%',100,'Height%',100);
-toPPT('setTitle','Example 7');
+toPPT({'Some text 1','Some text2'},'SlideNumber','append');
 
-toPPT(figure1,'pos','ME','Height',200,'Width',100); % ME = MiddelEast
-toPPT('setTitle','Example 7 - Changing the height and width of a figure');
+author = 'Jens Richter';
+initials = 'JR';
+comment = 'I have to make some annotations!';
 
-%% Example 8a  - Changing the padding/gap of the active placing area of the slide:
-% We want to change the default gap between our centred tile in the North and in 
-% the West/East. 
+toPPT('asComment',{author,initials,comment});
+toPPT('setTitle','Example 10 - Adding comments');
 
-figure1 = example_helper(1);
+%% Example 11 - Using commandChains:
+% CommandChains can be used to design a presentation e.g. within in other script file. 
+% The advantage is that no escaping is necessary and the presentation can be easily bundled. 
+% Annotation: In practice big CommandChains can exhibit the available physical memory. 
+% Especially when a lot of figures are put into the commandChain.
+% For a list of all available parameters call *help toPPT*. 
 
-toPPT(figure1,'gapN',200,'gapWE',150);
-toPPT('setTitle','Example 8a  - Changing the padding/gap of the active placing area of the slide');
+commandsCell{1} = {figure1,'Width%',50,'pos','ME'};
+commandsCell{2} = {'setTable',{{'<b>Caption1<\b>','<b>Caption2<\b>','<b>Caption3<\b>'},{helpTableCell}},'SlideNumber','current','Width',400,'Height',150,'pos%',[48,55],'posAnker','E'};
+commandsCell{3} = {'setTitle','Example 11 - Using commandChains'};
 
-%% Example 8b - Change the 'dividing' of the slide:
-% We want to change the divide property of the tiles - by default each
-% image is stretched to 100% of the tile height by keeping the aspect
-% ratio. For more information see *'help toPPT'*.
+for ii=1:numel(commandsCell)
+    toPPT('commandChain',commandsCell{ii});
+end
 
-figure1 = example_helper(1);
-figure2 = example_helper(2);
 
-toPPT(figure1,'pos','E','Width%',60,'divide',30);
-toPPT(figure2,'pos','W','SlideNumber','current','Width%',60,'divide',30);
-toPPT('setTitle','Example 8b - Change the dividing of the slide');
 
-%% Example 9 - Change the resolution of the figure for exporting:
+%% Example 12 - Change format and orientation of presentation:
+% In case the presentation needs to have another orientation or format this
+% option can be used. 
+% Annotation: It is recommended to this before adding any content to the slide.
+% For a list of all available parameters call *help toPPT*. 
+
+toPPT({'Changing the page orientation is done e.g by <b>toPPT(''setPageOrientation'',''landscape'');</b>','',...
+   'Changing the page orientation is done e.g by <b>toPPT(''setPageFormat'',''16:9'');</b>'},'SlideNumber','append','setBullets',0,'pos%',[1,20],'Width%',80);
+toPPT('setTitle','Example 12 - Change format and orientation of presentation');
+
+
+
+%% Example 13 - Change the resolution of the figure for exporting:
 % We want to *increase* (for publications etc.)/ *decrease* (smaller file size, faster)
 % the resolution of the png image that is used for exporting a figure.
 
-figure1 = example_helper(1);
-
 toPPT(figure1,'m',3); % Higher value, default is m = 2
-toPPT('setTitle','Example 9 - Change the resolution of the figure for exporting (high resolution)');
+toPPT('setTitle','Example 13 - Change the resolution of the figure for exporting (high resolution)');
+
+%% Adding a section for 'Figure editing and figure generation'
+toPPT('addSection','Figure editing and figure generation','Example 13 - Change the resolution of the figure for exporting (high resolution)','before');
 
 toPPT(figure1,'m',1); % Lower value, default is m = 2
-toPPT('setTitle','Example 9 - Change the resolution of the figure for exporting (low resolution)');
+toPPT('setTitle','Example 13 - Change the resolution of the figure for exporting (low resolution)');
 
-%% Example 10 - Export figure as vector graphic:
+
+
+%% Example 14 - Export figure as vector graphic:
 % We want to export our image as vector graphic. This process is quite
 % challenging. For huge figures with a lot of points it is not recommended
 % to use this function. *In case the export fails toPPT will use the default
 % png export as a fall back solution anyway.*
 
-figure1 = example_helper(2);
-toPPT(figure1,'format','vec');
-toPPT('setTitle','Example 10 - Export figure as vector graphic');
+figureVector = example_helper(2);
+toPPT(figureVector,'format','vec');
+toPPT('setTitle','Example 14 - Export figure as vector graphic');
 
 
-%% Example 11 - Specify parameters for export_fig directly via toPPT:
+%% Example 15 - Specify parameters for export_fig directly via toPPT:
 % toPPT makes strong use of *'export_fig'*. Maybe in some situations it is
 % necessary to supply parameters for export_fig directly. For this reason
 % all commands that are not recognized be toPPT are directly forwarded as
@@ -349,14 +511,13 @@ toPPT('setTitle','Example 10 - Export figure as vector graphic');
 % In this example we change the colorspace to CMYK and gray for the same
 % figure before exporting to powerpoint.
 
-figure1 = example_helper(1);
 
 toPPT(figure1,'pos','W','-CMYK'); % colorspace CMYK
 toPPT(figure1,'pos','E','SlideNumber','current','-gray'); % colorspace gray
-toPPT('setTitle','Example 11 - Change the colorspace (specify parameters for exportfig directly via toPPT)');
+toPPT('setTitle','Example 15 - Change the colorspace (specify parameters for exportfig directly via toPPT)');
 
 
-%% Example 12a - QR-Code with test message 'Hello world':
+%% Example 16a - QR-Code with test message 'Hello world':
 % *Annotation:* QR-Code generation is only available for *Matlab2014a* and
 % later. The QR-Code generation is based on *zxings* java libraries. 
 % For this purpose toPPT will import all
@@ -371,43 +532,35 @@ toPPT('setTitle','Example 11 - Change the colorspace (specify parameters for exp
 % We want to simply add a QR-Code with a test message.
 
 message = 'This is a hello world test message';
-toPPT(message,'TextAsQR',1);
-toPPT('setTitle','Example 12a - QR-Code with test message "Hello world"');
+toPPT(message,'TextAsQR',1,'SlideNumber','append');
+toPPT('setTitle','Example 16a - QR-Code with test message "Hello world"');
 
-%% Example 12b - Adding MECard as QR Code
+%% Example 16b - Adding MECard as QR Code
 % We want to add an QR code to the left corner at the bottom. The QR code
 % in this example is representing a MECARD. In addition we want to change
 % the background and QR-Code color.
 
 message = 'MECARD:N:Skywalker,Luke;ADR:76 9th Avenue, 4th Floor, New York, NY 10011;TEL:1234567891011;EMAIL:luke@skywalker.com;;';
 
-toPPT(message,'TextAsQR',1,'QR-Version',40,'pos','SW','Left',5,'gapS',15,'QR-Color','#00549F','QR-BgColor','#D5FFFF');
-toPPT(['<s color:#00549F; font-size:22; font-family:Aharoni>Thank you for your attention.',char(13),'Please scan the QR Code for Luke Skywalkers contact information.</s> '],'pos','ME','setBullets',0);
-toPPT('setTitle','Example 12b - Adding MECard as QR Code');
+toPPT(message,'TextAsQR',1,'QR-Version',40,'pos','SW','Left',5,'gapS',15,'QR-Color','#00549F','QR-BgColor','#D5FFFF','SlideNumber','append');
+toPPT(['<s color:#00549F; font-size:22; font-family:Aharoni>Thank you for your attention.',char(13),...
+    'Please scan the QR Code for Luke Skywalkers contact information.</s> '],'pos','ME','setBullets',0);
+toPPT('setTitle','Example 16b - Adding MECard as QR Code');
 
 
-%% Example 12c - Downloading the necessary jars from the internet:
+%% Example 16c - Downloading the necessary jars from the internet:
 % This will just add the necessary syntax for downloading the jars. We will
 % not do that at this point so you can decide on your own if you want to
 % download them.
 
 toPPT('Downloading jars for QR-Code generator is done by <b>toPPT(someStringMessage,''QR-DownloadJars'',1)</b>','SlideNumber','append');
-toPPT('setTitle','Example 12c - Syntax for downloading the necessary jars from the internet');
+toPPT('setTitle','Example 16c - Syntax for downloading the necessary jars from the internet');
 
 
-%% Example 13 - Applying a template to the active presentation:
-% Now we want to apply a template to our presentation. *The template file
-% path has to be absolute*.
 
-templatePath = [pwd,'\IPH Slides_EN.potx']; % The template path has to be absolute!
-%templatePath = [pwd,'\testtemplate.potx']; % The template path has to be absolute!
-toPPT('applyTemplate',templatePath);
 
-toPPT('We applied a template!','SlideNumber','append');
-toPPT('setTitle','Example 13 - Applying a template to the active presentation');
-
-%% Example 14 - Saving a presentation:
-% Now we want to save our presentation
+%% Example 17 - Saving a presentation:
+% Now we want to save our presentation.
 % There are three ways of saving
 %
 % _Case 1:_ We only supply the _*savePath*_ as argument
@@ -425,95 +578,54 @@ toPPT('setTitle','Example 13 - Applying a template to the active presentation');
 %
 % *The savepath has to be absolute.*
 
+% * Setting passwords when saving presentations.
+
 savePath = pwd;
 saveFilename = 'My first presentation with toPPT';
 
 toPPT('savePath',savePath,'saveFilename',saveFilename);
-toPPT(['We saved our presentation to: ',savePath,'/',saveFilename],'SlideNumber','append','TeX',0); % Because we want to "show" a filename we should turn of TeX otherwise all "\" will be gone etc.
-toPPT('setTitle','Example 14 - Saving a presentation');
+toPPT(['We saved our presentation to: ',savePath,'/',saveFilename]...
+    ,'SlideNumber','append','TeX',0); % Because we want to "show" a filename we should turn of TeX otherwise all "\" will be gone etc.
+
+toPPT('setTitle','Example 17 - Saving a presentation');
+
+%% Adding a section for saving, loading and closing presentation
+toPPT('addSection','Saving, loading and closing presentation','SlideNumber','Example 17 - Saving a presentation','before');
+
+%% Example 19 - Saving a presentation password protected
+% Saving a presentation password protected can be simply done by adding the
+% attriute 'savePassword' and the password itself as argument.
+% Annotation: A password protected presentation can NOT be loaded via
+% toPPT.
+
+toPPT('Saving a presentation password protected is done by <b>toPPT(''savePath'',''YOURSAVEPATH'',''saveFilename'',''YOURSAVEFILENAME'',''savePassword'',''YOURSAVEPASSWORD'',);</b>',...
+    '','SlideNumber','append','setBullets',0,'pos%',[1,20],'Width%',95);
+toPPT('setTitle','Example 19 - Saving a presentation password protected');
 
 
-savePath = pwd;
-saveFilename = 'passwordTest';
+%% Example 20 - Loading an existing presentation
+% In case an already existing presentation should be continued we can load
+% this presentation via toPPT in case no password was set previously.
 
-toPPT('savePath',savePath,'saveFilename',saveFilename,'savePassword',123);
+toPPT({'Open an existing presentation (absolute Path) is done by <b>toPPT(''openExisting'',''C:\myPresentation.pptx'');</b>','',...
+   'Open an existing presentation (relative Path) is done by <b>toPPT(''openExisting'',''.\myPresentation.pptx'');</b>'},...
+   'SlideNumber','append','setBullets',0,'pos%',[1,20],'Width%',95,'TeX',0);
+
+toPPT('setTitle','Example 10 - Loading an existing presentation');
 
 
-%% Example 15 - Closing a presentation:
+%% Example 21 - Closing a presentation:
 % We can close a presentation with toPPT - this can be helpful if we want
 % to create multiple different presentations and close them after we saved 
 % them. Because we do not want to close the presentation in this example we
 % just explain it on an extra slide.
 
 toPPT('Closing a presentation is done via the syntax <b>toPPT(''close'',1)</b>','SlideNumber','append');
-toPPT('setTitle','Example 15 - Closing a presentation');
+toPPT('setTitle','Example 21 - Closing a presentation');
 
-%% Done with the example. Lets close all generated figures.
+%% Done with the example. Let’s close all generated figures.
 close all;
 
-
-%% Valid Parmeters for toPPT:
-% *For a detailed help simply use 'help toPPT'*
-
-
-toPPT('asComment',{'Jens Richter','JR','Test12345'});
-toPPT('openExisting','C:\Users\Jens\Dropbox\Git-Repos\Matlab\passwordTest.pptx')
-
-figure1 = example_helper(2);
-toPPT(figure1,'Height',200,'Width',100);
-
-
-figure1 = example_helper(2);
-toPPT(figure1,'Width',200);
-
-figure1 = example_helper(2);
-toPPT(figure1,'Height',200);
-
-
-figure1 = example_helper(2);
-toPPT(figure1,'pos',[100,100],'Width',200,'Height',200);
-
-figure1 = example_helper(2);
-toPPT(figure1,'pos',[200,200],'Width',200,'Height',200,'posAnker','C');
-
-figure1 = example_helper(2);
-toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','NW');
-toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','SW','SlideNumber','current');
-toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','SE','SlideNumber','current');
-toPPT(figure1,'pos',[200,200],'Width%',20,'Height%',20,'posAnker','NE','SlideNumber','current');
-toPPT(figure1,'pos%',[50,50],'Width%',50,'Height%',10,'posAnker','C','SlideNumber','current');
-
-toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','N','SlideNumber','current');
-toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','S','SlideNumber','current');
-toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','E','SlideNumber','current');
-toPPT(figure1,'pos%',[50,50],'Width%',20,'Height%',20,'posAnker','W','SlideNumber','current');
-
-toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','N','SlideNumber','current');
-toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','S','SlideNumber','current');
-toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','E','SlideNumber','current');
-toPPT(figure1,'pos%',[10,50],'Width%',20,'posAnker','W','SlideNumber','current');
-
-
-toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','C','SlideNumber','append');
-toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','S','SlideNumber','current');
-toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','E','SlideNumber','current');
-toPPT(figure1,'pos%',[50,50],'Height%',20,'posAnker','W','SlideNumber','current');
-
-toPPT(figure1,'pos',[200,200],'Width',100,'posAnker','C','SlideNumber','append');
-toPPT('test','pos',[200,200],'Width',100,'posAnker','C','SlideNumber','append');
-
-toPPT('test','pos',[200,200],'Width',100,'posAnker','W','SlideNumber','append');
-toPPT('test','pos',[200,200],'SlideNumber','append');
-
-toPPT({'test2','test','test','test'},'pos',[200,200],'SlideNumber','current');
-
-toPPT({'test2','test','test','test'},'pos%',[50,50],'SlideNumber','append');
-
-toPPT('addSection',{'Test'});
-
-toPPT('addSection','Test','SlideNumber','Axample 3a - bddinaag a figure at a cerdastain positiddd5on','SlideAddMethod','before')
-
-toPPT('addSection','Test2','SlideNumber',10,'SlideAddMethod','after')
 
 %% toPPT accepts the following predefined colors:
 %     %White colors

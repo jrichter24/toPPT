@@ -26,6 +26,9 @@ function addText(myArg)
 %   <s color:red>Red text</s> - => Use 'help rgb' for a list of all
 %       accepted colors
 %
+%   <s bg:red>Text with red background</s> - => Use 'help rgb' for a list of all
+%       accepted colors
+%
 %   <s color:#5F9EA0> Hex Color Text</s> - A color can be defined as
 %       Hex-String. It is important to use a '#' before the color code.
 %
