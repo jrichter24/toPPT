@@ -23,7 +23,11 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     toPPTFigure.objectWidth              = [];
     toPPTFigure.defaultPosAnker          = 'C';                             %% User can change value
     toPPTFigure.posPercentageByUser      = 0;
-    
+    toPPTFigure.defaultExportMode        = 'exportFig';                     %% User can change value => 'exportFig' or 'matlab'
+    toPPTFigure.defaultExportFormatType  = 'meta';                          %% User can change value => toPPTFigure.allowedExportFormatType
+    toPPTFigure.allowedExportFormatType    = {'jpeg','png','tiff','tiffn','meta','bmpmono','bmp','bmp16m','bmp256','hdf','pbm','pbmraw','pcxmono','pcx24b','pcx256','pcx16','pgm','pgmraw','ppm','ppmraw','clipboard'};
+    toPPTFigure.allowedExportFormatTypeExt = {'.jpg','.png','.tif','.tif','.emf','.bmp','.bmp','.bmp','.bmp','.hdf','.pbm','.pbm','.pcx','.pcx','.pcx','.pcx','.pgm','.pgm','.ppm','.ppm',''};
+        
     % Additional for figures in png format
     toPPTFigurePNG                       = toPPTFigure;
     toPPTFigurePNG.defaultMagnify        = 2;                               %% User can change value
@@ -41,8 +45,7 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     % Page Setup
     toPPTText.doSetPageFormat           = 0; % By default the default page setup from powerpoint will be used
     toPPTText.doSetPageOrientation      = 0; % By default the default page setup from powerpoint will be used
-    
-    %toPPTText.pageFormat                = '4:3'; % Available values would be 4:3, 16:9 and so on
+
     toPPTText.knownPageFormats          = {  '4:3',  '16:9', '16:10', 'Letter','Ledger', 'A3',    'A4',       'B4',      'B5'}; % Title of the format
     toPPTText.pageFormatscalingFactor   = 4/3;   % This especially kicks in for PowerPoint2013 => is 1 for PowerPoint2010        
     toPPTText.knownPageFormatsDesc      = {[10,7.5]*toPPTText.pageFormatscalingFactor,[10,5.6]*toPPTText.pageFormatscalingFactor,[10,6.2]*toPPTText.pageFormatscalingFactor,[8.5,11]*toPPTText.pageFormatscalingFactor,[17,11]*toPPTText.pageFormatscalingFactor,[14,10.5]*toPPTText.pageFormatscalingFactor,[10.8,7.5]*toPPTText.pageFormatscalingFactor,[11.8,8.9]*toPPTText.pageFormatscalingFactor,[7.8,5.9]*toPPTText.pageFormatscalingFactor} ; % Size of format in the same oder as the title in inch (width,height)

@@ -597,6 +597,9 @@ function setTitle(myArg,slide)
     end
     
     
+    intperetHtml(toLinebreakVersion(myArg.defaultTitle),slide.Shapes.Title.TextFrame.TextRange,myArg);
+    
+    
 %     try
 %         set(slide.Shapes.Title.TextFrame.TextRange,'Text',myArg.defaultTitle);
 % 

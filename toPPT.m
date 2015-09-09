@@ -1,4 +1,4 @@
-% toPPT-2.1 by Jens Richter 
+% toPPT-2.2 by Jens Richter 
 % email: jrichter@iph.rwth-aachen.de
 %
 % The following help describes the parameters in the order they appear in
@@ -217,6 +217,33 @@
 %   Example:
 %   toPPT(figure,'format','vec') - adds a figure to a new slide in vector
 %   format.
+%
+%
+%
+% Parameter 'exportMode' and 'exportFormatType':
+% ---------------
+%   By default figures are added as png by using exportFig. The quality of
+%   the export has a high level using exportFig. In case of generating
+%   presentations with a lot of images the export is quite time consuming and 
+%   the resulting presentation has a huge file size.
+%   By setting exportMode to "matlab" instead of "exportFig" (default) the
+%   internal matlab functions will be used for exporting the figure what is
+%   usually much faster and the resulting presentation is much smaller.
+%   When using "matlab" for exporting an exportFormatType can be specified 
+%   what will define the export type.
+%
+%   The following exportFormatTypes are possible:
+%   'jpeg','png','tiff','tiffn','meta','bmpmono','bmp','bmp16m','bmp256',
+%   'hdf','pbm','pbmraw','pcxmono','pcx24b','pcx256','pcx16','pgm',
+%   'pgmraw','ppm' and 'ppmraw'.
+%
+%   'meta' is the default exportFormatType.
+%
+%
+%   Example:
+%   toPPT(figure,'exportMode','matlab');
+%   toPPT(figure,'exportMode','matlab','exportFormatType','bmp');
+%   
 %
 % Parameter 'addSection':
 % ---------------
@@ -944,6 +971,23 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
 
     if strcmp(out,'vec') || strcmp(out,'png')
         
+        
+        %%% exportMode %%%
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'exportMode');
+        if ~isempty(structMyArgument.value)
+            myArg.defaultExportMode  = structMyArgument.value;
+            arguments        = structMyArgument.arguments;
+        end
+        
+        
+        %%%toPPTFigure.defaultExportFormatType
+        %%% ExportFormatType %%%
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'exportFormatType');
+        if ~isempty(structMyArgument.value)
+            myArg.defaultExportFormatType  = structMyArgument.value;
+            arguments                      = structMyArgument.arguments;
+        end
+        
         %%% Position %%% e.g. NE
         structMyArgument = deleteFromArgumentAndGetValue(arguments,'pos');
         if ~isempty(structMyArgument.value)
@@ -960,6 +1004,9 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             myArg.posPercentageByUser  = 1;
             arguments                  = structMyArgument.arguments;
         end
+        %%%
+        
+        
         %%%
         
         %%% elementAnker only applies if pos is NOT a string! e.g. pos = [200,200]
