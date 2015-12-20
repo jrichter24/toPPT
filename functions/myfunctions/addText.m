@@ -620,11 +620,14 @@ function setText(myArg,slide,myFormattedText)
     % underlined
     %set(myNewTextBox.TextFrame.TextRange,'Text',myFormattedText); %Working
     
+    %set(myNewTextBox.Fill.ForeColor,'RGB',rgb('red','ppt'))
+    %set(myNewTextBox,'ppBorderLeft ','ppBorderLeft');
+    
     intperetHtml(myFormattedText,myNewTextBox.TextFrame.TextRange,myArg);
     
     
     %Adding bullets - can be truned off if user does not want that
-    
+     
     if myArg.addBulletPoints
     %ItemsBulletedList
        
@@ -638,9 +641,29 @@ function setText(myArg,slide,myFormattedText)
             set(myNewTextBox.TextFrame.TextRange.ParagraphFormat.Bullet,'RelativeSize',1);%Working
             set(myNewTextBox.TextFrame.TextRange.ParagraphFormat.Bullet,'Type','ppBulletUnnumbered');%WorkingCircle
         end
- 
-        
     end
+    
+    
+    if myArg.addTextBoxFrame
+        
+        % Works
+        set(myNewTextBox.Line,'Visible','msoTrue');
+
+        set(myNewTextBox.Line,'Weight',myArg.defaultFrameWidth);
+        set(myNewTextBox.Line,'DashStyle',myArg.defaultFrameType);
+
+        cureForeColor  = myNewTextBox.Line.ForeColor;
+        set(cureForeColor,'RGB',rgb(myArg.defaultFrameColor ,'ppt'));
+    
+    end
+    
+    
+    
+    % Do Rotation
+    set(myNewTextBox,'Rotation', myArg.defaultTextBoxRotation);
+    
+    
+    
 end
 
 

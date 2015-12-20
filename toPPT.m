@@ -79,6 +79,22 @@
 %   toPPT({'Text1','Text2','Text3'}) - adds each of the elements in the cell as separate bullet point.
 %
 %
+% Parameter 'hasFrame','frameType','frameColor' and 'frameWidth'
+% ---------------
+%   toPPT('Mytext','hasFrame',1,'frameType','DashDotDot','frameColor','blue','frameWidth',6)
+%
+%   - Can be used to add an visible frame arround a textBox. For more
+%   information on frameTypes check toPPT_conifg under toPPTText.knownTextBoxFramesTitle
+%
+%
+% Parameter 'rotationAngle'
+% ---------------
+%   toPPT('Mytext','rotationAngle',10)
+%
+%   - Rotates a textBox by 10 degrees.
+%
+%
+%
 % Parameter 'setBulletNumbers'
 % ---------------
 %   toPPT('My text','setBulletNumbers',1) - uses numbers instead of bullet points.
@@ -1428,6 +1444,64 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             myArg.defaultHyperlink     = structMyArgument.value;
             arguments                  = structMyArgument.arguments;
             myArg.doSetHyper           = 1;
+        end
+        
+        
+        %%% Do we want a visible frame arround the textBox?
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'hasFrame');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.addTextBoxFrame   = structMyArgument.value;
+            arguments               = structMyArgument.arguments;
+        end
+        
+        
+        %%% Set color for frame arround the textBox
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'frameColor');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.defaultFrameColor   = structMyArgument.value;
+            arguments                 = structMyArgument.arguments;
+            myArg.addTextBoxFrame     = 1;
+        end
+        
+        %%% Set width for frame arround the textBox
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'frameWidth');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.defaultFrameWidth   = structMyArgument.value;
+            arguments                 = structMyArgument.arguments;
+            myArg.addTextBoxFrame     = 1;
+        end
+        
+        
+        %%% Set type for frame arround the textBox
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'frameType');
+        
+        if ~isempty(structMyArgument.value)
+            tempFrameType             = structMyArgument.value;
+            
+            % Get original title from type
+            [isMember,indexFrameType] = ismember(tempFrameType,myArg.knownTextBoxFramesTitle);
+            
+            if ~isMember
+                warning('The frame type is not known. Please check toPPT_config under toPPTText.knownTextBoxFramesTitle for all assignable frameTypes.')
+            else
+            
+                myArg.defaultFrameType    = myArg.knownTextBoxFramesTitleOrg{indexFrameType};
+                arguments                 = structMyArgument.arguments;
+                
+            end
+            
+            myArg.addTextBoxFrame     = 1;
+        end
+        
+        %%% Set width for frame arround the textBox
+        structMyArgument = deleteFromArgumentAndGetValue(arguments,'rotationAngle');
+        
+        if ~isempty(structMyArgument.value)
+            myArg.defaultTextBoxRotation   = structMyArgument.value;
+            arguments                      = structMyArgument.arguments;
         end
         
 

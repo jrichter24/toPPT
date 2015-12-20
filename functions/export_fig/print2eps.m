@@ -1,18 +1,17 @@
-function print2eps(name, fig, bb_padding, varargin)
+function print2eps(name, fig, export_options, varargin)
 %PRINT2EPS  Prints figures to eps with improved line styles
 %
 % Examples:
 %   print2eps filename
 %   print2eps(filename, fig_handle)
-%   print2eps(filename, fig_handle, bb_padding)
-%   print2eps(filename, fig_handle, bb_padding, options)
+%   print2eps(filename, fig_handle, export_options)
+%   print2eps(filename, fig_handle, export_options, print_options)
 %
 % This function saves a figure as an eps file, with two improvements over
 % MATLAB's print command. First, it improves the line style, making dashed
-% lines more like those on screen and giving grid lines their own dotted
-% style. Secondly, it substitutes original font names back into the eps
-% file, where these have been changed by MATLAB, for up to 11 different
-% fonts.
+% lines more like those on screen and giving grid lines a dotted line style.
+% Secondly, it substitutes original font names back into the eps file,
+% where these have been changed by MATLAB, for up to 11 different fonts.
 %
 %IN:
 %   filename - string containing the name (optionally including full or
@@ -20,11 +19,14 @@ function print2eps(name, fig, bb_padding, varargin)
 %              ".eps" extension is added if not there already. If a path is
 %              not specified, the figure is saved in the current directory.
 %   fig_handle - The handle of the figure to be saved. Default: gcf().
-%   bb_padding - Scalar value of amount of padding to add to border around
-%                the cropped image, in points (if >1) or percent (if <1).
-%                Can be negative as well as positive; Default: 0.
-%                May be a 2-element vector of padding and crop amount. 
-%   options - Additional parameter strings to be passed to print.
+%   export_options - array or struct of optional scalar values:
+%       bb_padding - Scalar value of amount of padding to add to border around
+%                    the cropped image, in points (if >1) or percent (if <1).
+%                    Can be negative as well as positive; Default: 0
+%       crop       - Crop amount. Deafult: 0
+%       fontswap   - Whether to swap non-default fonts in figure. Default: true
+%       renderer   - Renderer used to generate bounding-box. Default: 'opengl'
+%   print_options - Additional parameter strings to be passed to the print command
 
 %{
 % Copyright (C) Oliver Woodford 2008-2014, Yair Altman 2015-
@@ -73,24 +75,47 @@ function print2eps(name, fig, bb_padding, varargin)
 % 09/04/15: Comment blocks consolidation and minor code cleanup (no real code change)
 % 12/04/15: Fixed issue #56: bad cropping
 % 14/04/15: Workaround for issue #45: lines in image subplots are exported in invalid color
+% 07/07/15: Added option to avoid font-swapping in EPS/PDF
+% 07/07/15: Fixed issue #83: use numeric handles in HG1
+% 22/07/15: Fixed issue #91 (thanks to Carlos Moffat)
+% 28/09/15: Fixed issue #108 (thanks to JacobD10)
+% 01/11/15: Fixed issue #112: optional renderer for bounding-box computation (thanks to Jesús Pestana Puerta)
 %}
 
     options = {'-loose'};
     if nargin > 3
         options = [options varargin];
     elseif nargin < 3
-        bb_padding = 0;
+        export_options = 0;
         if nargin < 2
             fig = gcf();
         end
     end
 
-    % Retrieve crop value (2nd element of bb_padding vector, or default=0)
-    try
-        bb_crop = bb_padding(2);
-        bb_padding = bb_padding(1);  % reached this point, so it's a vector
-    catch
-        bb_crop = 0;  % scalar value, so use default bb_crop value of 0
+    % Retrieve padding, crop & font-swap values
+    if isstruct(export_options)
+        try fontswap   = export_options.fontswap;    catch, fontswap = true;     end
+        try bb_crop    = export_options.crop;        catch, bb_crop = 0;         end
+        try bb_padding = export_options.bb_padding;  catch, bb_padding = 0;      end
+        try renderer   = export_options.rendererStr; catch, renderer = 'opengl'; end  % fix for issue #110
+        if renderer(1)~='-',  renderer = ['-' renderer];  end
+    else
+        if numel(export_options) > 2  % font-swapping
+            fontswap = export_options(3);
+        else
+            fontswap = true;
+        end
+        if numel(export_options) > 1  % cropping
+            bb_crop = export_options(2);
+        else
+            bb_crop = 0;  % scalar value, so use default bb_crop value of 0
+        end
+        if numel(export_options) > 0  % padding
+            bb_padding = export_options(1);
+        else
+            bb_padding = 0;
+        end
+        renderer = '-opengl';
     end
 
     % Construct the filename
@@ -130,18 +155,22 @@ function print2eps(name, fig, bb_padding, varargin)
     fontslu = unique(fontsl);
 
     % Determine the font swap table
-    matlab_fonts = {'Helvetica', 'Times-Roman', 'Palatino', 'Bookman', 'Helvetica-Narrow', 'Symbol', ...
-        'AvantGarde', 'NewCenturySchlbk', 'Courier', 'ZapfChancery', 'ZapfDingbats'};
-    matlab_fontsl = lower(matlab_fonts);
-    require_swap = find(~ismember(fontslu, matlab_fontsl));
-    unused_fonts = find(~ismember(matlab_fontsl, fontslu));
-    font_swap = cell(3, min(numel(require_swap), numel(unused_fonts)));
-    fonts_new = fonts;
-    for a = 1:size(font_swap, 2)
-        font_swap{1,a} = find(strcmp(fontslu{require_swap(a)}, fontsl));
-        font_swap{2,a} = matlab_fonts{unused_fonts(a)};
-        font_swap{3,a} = fonts{font_swap{1,a}(1)};
-        fonts_new(font_swap{1,a}) = font_swap(2,a);
+    if fontswap
+        matlab_fonts = {'Helvetica', 'Times-Roman', 'Palatino', 'Bookman', 'Helvetica-Narrow', 'Symbol', ...
+                        'AvantGarde', 'NewCenturySchlbk', 'Courier', 'ZapfChancery', 'ZapfDingbats'};
+        matlab_fontsl = lower(matlab_fonts);
+        require_swap = find(~ismember(fontslu, matlab_fontsl));
+        unused_fonts = find(~ismember(matlab_fontsl, fontslu));
+        font_swap = cell(3, min(numel(require_swap), numel(unused_fonts)));
+        fonts_new = fonts;
+        for a = 1:size(font_swap, 2)
+            font_swap{1,a} = find(strcmp(fontslu{require_swap(a)}, fontsl));
+            font_swap{2,a} = matlab_fonts{unused_fonts(a)};
+            font_swap{3,a} = fonts{font_swap{1,a}(1)};
+            fonts_new(font_swap{1,a}) = font_swap(2,a);
+        end
+    else
+        font_swap = [];
     end
 
     % Swap the fonts
@@ -207,6 +236,15 @@ function print2eps(name, fig, bb_padding, varargin)
         end
     end
 
+    % Fix issue #83: use numeric handles in HG1
+    if ~using_hg2(fig),  fig = double(fig);  end
+    
+    % Workaround for when transparency is lost through conversion fig>EPS>PDF (issue #108)
+    % Replace transparent patch RGB values with an ID value (rare chance that ID color is being used already)
+    if using_hg2
+        origAlphaColors = eps_maintainAlpha(fig);
+    end
+
     % Print to eps file
     print(fig, options{:}, name);
 
@@ -217,7 +255,13 @@ function print2eps(name, fig, bb_padding, varargin)
     catch
         fstrm = '';
     end
-
+    
+    % Restore colors for transparent patches and apply the
+    % setopacityalpha setting in the EPS file (issue #108)
+    if using_hg2
+        [~,fstrm] = eps_maintainAlpha(fig, fstrm, origAlphaColors);
+    end
+    
     % Fix for Matlab R2014b bug (issue #31): LineWidths<0.75 are not set in the EPS (default line width is used)
     try
         if ~isempty(fstrm) && using_hg2(fig)
@@ -347,7 +391,7 @@ function print2eps(name, fig, bb_padding, varargin)
 
         % 2. Create a bitmap image and use crop_borders to create the relative
         %    bb with respect to the PageBoundingBox
-        [A, bcol] = print2array(fig, 1, '-opengl');
+        [A, bcol] = print2array(fig, 1, renderer);
         [aa, aa, aa, bb_rel] = crop_borders(A, bcol, bb_padding);
 
         % 3. Calculate the new Bounding Box
@@ -384,4 +428,42 @@ function print2eps(name, fig, bb_padding, varargin)
 
     % Write out the fixed eps file
     read_write_entire_textfile(name, fstrm);
+end
+
+function [StoredColors, fstrm] = eps_maintainAlpha(fig_, fstrm, StoredColors)
+    if nargin == 1
+        ars = findobj(fig_,'Type','Area');
+        StoredColors={};
+        for ar = 1:length(ars)
+            if strcmp(ars(ar).Face.ColorType, 'truecoloralpha')
+                StoredColors{end+1}=ars(ar).Face.ColorData;
+                ars(ar).Face.ColorData = uint8([101; 102; length(StoredColors); 255]);
+            end
+        end
+    else
+        %Find the transparent patches
+        ars = findobj(fig_,'Type','Area');
+        ar_stored = 0;
+        try
+            for ar = 1:length(ars)
+                if strcmp(ars(ar).Face.ColorType, 'truecoloralpha')
+                    ar_stored = ar_stored + 1;
+                    stored = StoredColors{ar_stored}';
+                    %Restore the EPS files patch color
+                    colorID = num2str(round([101 102 ar_stored]/255,3),'%.3g %.3g %.3g'); %ID for searching
+                    originalColor = num2str(round(double(stored(1:end-1))/255,3),'%.3g %.3g %.3g'); %Replace with original color
+                    alpha_ = num2str(round(double(stored(end))/255,3),'%.3g'); %Convert alpha value for EPS
+                    %Find and replace
+                    fstrm = strrep(fstrm, ...
+                        sprintf(['CT\n' colorID ' RC\nN\n']), ...
+                        sprintf(['CT\n' originalColor ' RC\n' alpha_ ' .setopacityalpha true\nN\n']));
+
+                    %Restore the figures patch color
+                    ars(ar).Face.ColorData = StoredColors{ar_stored};
+                end
+            end
+        catch err
+            fprintf(2, 'Error maintaining transparency in EPS file: %s\n at %s:%d\n', err.message, err.stack(1).file, err.stack(1).line);
+        end
+    end
 end

@@ -97,6 +97,7 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     toPPTText.posPercentageByUser       = 0;
     toPPTText.userSection               = [];
     toPPTText.doAddSection              = 0;
+
     
     toPPTText.myPresentationHeight      = [];
     toPPTText.myPresentationWidth       = [];
@@ -106,6 +107,18 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     
     toPPTText.doSetHyper                = 0;
     toPPTText.defaultHyperlink          = 'MyHyperLink';
+    
+    
+    toPPTText.addTextBoxFrame           = 0; % By default no visible frame arround textBox (=0)
+    toPPTText.knownTextBoxFramesTitleOrg= {'msoLineDashStyleMixed','msoLineSolid','msoLineSquareDot','msoLineRoundDot','msoLineDash','msoLineDashDot','msoLineDashDotDot','msoLineLongDash','msoLineLongDashDot',...
+                                           'msoLineLongDashDotDot','msoLineSysDash','msoLineSysDot','msoLineSysDashDot'};
+    toPPTText.knownTextBoxFramesTitle   = {'DashStyleMixed','Solid','SquareDot','RoundDot','Dash','DashDot','DashDotDot','LongDash','LongDashDot',...
+                                           'LongDashDotDot','SysDash','SysDot','SysDashDot'};
+    toPPTText.defaultFrameType          = 'msoLineSolid';
+    toPPTText.defaultFrameColor         = '#000000'; 
+    toPPTText.defaultFrameWidth         = 2;
+    
+    toPPTText.defaultTextBoxRotation    = 0; % as angle
     
     %% QR CODE PARTS like source url for jars etc. will be taken from qrcode_config
     toPPTQR.color   = '#000000';                                            %% User can change value

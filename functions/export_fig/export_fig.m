@@ -21,6 +21,8 @@ function [imageData, alpha] = export_fig(varargin)
 %   export_fig ... -append
 %   export_fig ... -bookmark
 %   export_fig ... -clipboard
+%   export_fig ... -update
+%   export_fig ... -nofontswap
 %   export_fig(..., handle)
 %
 % This function saves a figure or single axes to one or more vector and/or
@@ -138,12 +140,16 @@ function [imageData, alpha] = export_fig(varargin)
 %                Note: background transparency is not preserved in clipboard
 %   -d<gs_option> - option to indicate a ghostscript setting. For example,
 %                   -dMaxBitmap=0 or -dNoOutputFonts (Ghostscript 9.15+).
-%   -depsc - option to use EPS level-3 rather than the default level-2 print
-%            device. This solves some bugs with Matlab's default -depsc2 device
-%            such as discolored subplot lines on images (vector formats only).
-%   handle - The handle of the figure, axes or uipanels (can be an array of
-%            handles, but the objects must be in the same figure) to be
-%            saved. Default: gcf.
+%   -depsc -  option to use EPS level-3 rather than the default level-2 print
+%             device. This solves some bugs with Matlab's default -depsc2 device
+%             such as discolored subplot lines on images (vector formats only).
+%   -update - option to download and install the latest version of export_fig
+%   -nofontswap - option to avoid font swapping. Font swapping is automatically
+%             done in vector formats (only): 11 standard Matlab fonts are
+%             replaced by the original figure fonts. This option prevents this.
+%   handle -  The handle of the figure, axes or uipanels (can be an array of
+%             handles, but the objects must be in the same figure) to be
+%             saved. Default: gcf.
 %
 % Outputs:
 %   imageData - MxNxC uint8 image array of the exported image.
@@ -216,6 +222,15 @@ function [imageData, alpha] = export_fig(varargin)
 % 28/05/15: Fixed issue #69: set non-bold label font only if the string contains symbols (\beta etc.), followup to issue #21
 % 29/05/15: Added informative error message in case user requested SVG output (issue #72)
 % 09/06/15: Fixed issue #58: -transparent removed anti-aliasing when exporting to PNG
+% 19/06/15: Added -update option to download and install the latest version of export_fig
+% 07/07/15: Added -nofontswap option to avoid font-swapping in EPS/PDF
+% 16/07/15: Fixed problem with anti-aliasing on old Matlab releases
+% 11/09/15: Fixed issue #103: magnification must never become negative; also fixed reported error msg in parsing input params
+% 26/09/15: Alert if trying to export transparent patches/areas to non-PNG outputs (issue #108)
+% 04/10/15: Do not suggest workarounds for certain errors that have already been handled previously
+% 01/11/15: Fixed issue #112: use same renderer in print2eps as export_fig (thanks to Jesús Pestana Puerta)
+% 10/11/15: Custom GS installation webpage for MacOS. Thanks to Andy Hueni via FEX
+% 19/11/15: Fixed clipboard export in R2015b (thanks to Dan K via FEX)
 %}
 
     if nargout
@@ -318,8 +333,11 @@ function [imageData, alpha] = export_fig(varargin)
     try
         if ~using_hg2(fig)
             annotationHandles = findall(fig,'Type','hggroup','-and','-property','Units','-and','-not','Units','norm');
-            originalUnits = get(annotationHandles,'Units');
-            set(annotationHandles,'Units','norm');
+            try  % suggested by Jesús Pestana Puerta (jespestana) 30/9/2015
+                originalUnits = get(annotationHandles,'Units');
+                set(annotationHandles,'Units','norm');
+            catch
+            end
         end
     catch
         % should never happen, but ignore in any case - issue #50
@@ -341,6 +359,19 @@ function [imageData, alpha] = export_fig(varargin)
             renderer = '-painters';
         otherwise
             renderer = '-opengl'; % Default for bitmaps
+    end
+
+    % Handle transparent patches
+    hasTransparency = ~isempty(findall(fig,'-property','FaceAlpha','-and','-not','FaceAlpha',1));
+    hasPatches      = ~isempty(findall(fig,'type','patch'));
+    if hasTransparency
+        % Alert if trying to export transparent patches/areas to non-PNG outputs (issue #108)
+        msg = 'export_fig currently supports transparent patches/areas only in PNG output. ';
+        if options.pdf
+            warning('export_fig:transparency', '%s\nTo export transparent patches/areas to PDF, use the print command:\n print(gcf, ''-dpdf'', ''%s.pdf'');', msg, options.name);
+        elseif ~options.png
+            warning('export_fig:transparency', '%s\nTo export the transparency correctly, try using the ScreenCapture utility on the Matlab File Exchange: http://bit.ly/1QFrBip', msg);
+        end
     end
 
     try
@@ -538,14 +569,14 @@ function [imageData, alpha] = export_fig(varargin)
         if isvector(options)
             % Set the default renderer to painters
             if ~options.renderer
-                if isempty(findall(fig,'-property','FaceAlpha','-and','-not','FaceAlpha',1)) && ...
-                        isempty(findall(fig,'type','patch'))
-                    renderer = '-painters';
-                else
+                if hasTransparency || hasPatches
                     % This is *MUCH* slower, but more accurate for patches and transparent annotations (issue #39)
                     renderer = '-opengl';
+                else
+                    renderer = '-painters';
                 end
             end
+            options.rendererStr = renderer;  % fix for issue #112
             % Generate some filenames
             tmp_nam = [tempname '.eps'];
             try
@@ -591,7 +622,7 @@ function [imageData, alpha] = export_fig(varargin)
             end
             try
                 % Generate an eps
-                print2eps(tmp_nam, fig, [options.bb_padding, options.crop], p2eArgs{:});
+                print2eps(tmp_nam, fig, options, p2eArgs{:});
                 % Remove the background, if desired
                 if options.transparent && ~isequal(get(fig, 'Color'), 'none')
                     eps_remove_background(tmp_nam, 1 + using_hg2(fig));
@@ -702,12 +733,12 @@ function [imageData, alpha] = export_fig(varargin)
             end
             try
                 % Import necessary Java classes
-                import java.awt.Toolkit.*
+                import java.awt.Toolkit
                 import java.awt.image.BufferedImage
                 import java.awt.datatransfer.DataFlavor
 
                 % Get System Clipboard object (java.awt.Toolkit)
-                cb = getDefaultToolkit.getSystemClipboard();
+                cb = Toolkit.getDefaultToolkit.getSystemClipboard();
 
                 % Add java class (ImageSelection) to the path
                 if ~exist('ImageSelection', 'class')
@@ -753,11 +784,15 @@ function [imageData, alpha] = export_fig(varargin)
         end
     catch err
         % Display possible workarounds before the error message
-        if displaySuggestedWorkarounds
+        if displaySuggestedWorkarounds && ~strcmpi(err.message,'export_fig error')
             if ~hadError,  fprintf(2, 'export_fig error. ');  end
             fprintf(2, 'Please ensure:\n');
             fprintf(2, '  that you are using the <a href="https://github.com/altmany/export_fig/archive/master.zip">latest version</a> of export_fig\n');
-            fprintf(2, '  and that you have <a href="http://www.ghostscript.com">Ghostscript</a> installed\n');
+            if ismac
+                fprintf(2, '  and that you have <a href="http://pages.uoregon.edu/koch">Ghostscript</a> installed\n');
+            else
+                fprintf(2, '  and that you have <a href="http://www.ghostscript.com">Ghostscript</a> installed\n');
+            end
             try
                 if options.eps
                     fprintf(2, '  and that you have <a href="http://www.foolabs.com/xpdf">pdftops</a> installed\n');
@@ -799,6 +834,8 @@ function [fig, options] = parse_args(nout, fig, varargin)
         'bookmark', false, ...
         'closeFig', false, ...
         'quality', [], ...
+        'update', false, ...
+        'fontswap', true, ...
         'gs_options', {{}});
     native = false; % Set resolution to native of an image
 
@@ -860,31 +897,66 @@ function [fig, options] = parse_args(nout, fig, varargin)
                                '  2. plot2svg utility: http://github.com/jschwizer99/plot2svg\n' ...
                                '  3. export_fig to EPS/PDF, then convert to SVG using generic (non-Matlab) tools\n'];
                         error(sprintf(msg)); %#ok<SPERR>
+                    case 'update'
+                        % Download the latest version of export_fig into the export_fig folder
+                        try
+                            zipFileName = 'https://github.com/altmany/export_fig/archive/master.zip';
+                            folderName = fileparts(which(mfilename('fullpath')));
+                            targetFileName = fullfile(folderName, datestr(now,'yyyy-mm-dd.zip'));
+                            urlwrite(zipFileName,targetFileName);
+                        catch
+                            error('Could not download %s into %s\n',zipFileName,targetFileName);
+                        end
+
+                        % Unzip the downloaded zip file in the export_fig folder
+                        try
+                            unzip(targetFileName,folderName);
+                        catch
+                            error('Could not unzip %s\n',targetFileName);
+                        end
+                    case 'nofontswap'
+                        options.fontswap = false;
                     otherwise
-                        if strcmpi(varargin{a}(1:2),'-d')
-                            varargin{a}(2) = 'd';  % ensure lowercase 'd'
-                            options.gs_options{end+1} = varargin{a};
-                        else
-                            val = str2double(regexp(varargin{a}, '(?<=-(m|M|r|R|q|Q|p|P))-?\d*.?\d+', 'match'));
-                            if isempty(val) || isnan(val)
-                                % Issue #51: improved processing of input args (accept space between param name & value)
-                                val = str2double(varargin{a+1});
-                                if isscalar(val) && ~isnan(val)
-                                    skipNext = true;
+                        try
+                            wasError = false;
+                            if strcmpi(varargin{a}(1:2),'-d')
+                                varargin{a}(2) = 'd';  % ensure lowercase 'd'
+                                options.gs_options{end+1} = varargin{a};
+                            else
+                                val = str2double(regexp(varargin{a}, '(?<=-(m|M|r|R|q|Q|p|P))-?\d*.?\d+', 'match'));
+                                if isempty(val) || isnan(val)
+                                    % Issue #51: improved processing of input args (accept space between param name & value)
+                                    val = str2double(varargin{a+1});
+                                    if isscalar(val) && ~isnan(val)
+                                        skipNext = true;
+                                    end
+                                end
+                                if ~isscalar(val) || isnan(val)
+                                    wasError = true;
+                                    error('option %s is not recognised or cannot be parsed', varargin{a});
+                                end
+                                switch lower(varargin{a}(2))
+                                    case 'm'
+                                        % Magnification may never be negative
+                                        if val <= 0
+                                            wasError = true;
+                                            error('Bad magnification value: %g (must be positive)', val);
+                                        end
+                                        options.magnify = val;
+                                    case 'r'
+                                        options.resolution = val;
+                                    case 'q'
+                                        options.quality = max(val, 0);
+                                    case 'p'
+                                        options.bb_padding = val;
                                 end
                             end
-                            if ~isscalar(val) || isnan(val)
-                                error('option %s is not recognised or cannot be parsed', varargin{a});
-                            end
-                            switch lower(varargin{a}(2))
-                                case 'm'
-                                    options.magnify = val;
-                                case 'r'
-                                    options.resolution = val;
-                                case 'q'
-                                    options.quality = max(val, 0);
-                                case 'p'
-                                    options.bb_padding = val;
+                        catch err
+                            % We might have reached here by raising an intentional error
+                            if wasError  % intentional raise
+                                rethrow(err)
+                            else  % unintentional
+                                error(['Unrecognized export_fig input option: ''' varargin{a} '''']);
                             end
                         end
                 end
@@ -941,7 +1013,8 @@ function [fig, options] = parse_args(nout, fig, varargin)
 
     % Set default anti-aliasing now we know the renderer
     if options.aa_factor == 0
-        options.aa_factor = 1 + 2 * (~(using_hg2(fig) && strcmp(get(ancestor(fig, 'figure'), 'GraphicsSmoothing'), 'on')) | (options.renderer == 3));
+        try isAA = strcmp(get(ancestor(fig, 'figure'), 'GraphicsSmoothing'), 'on'); catch, isAA = false; end
+        options.aa_factor = 1 + 2 * (~(using_hg2(fig) && isAA) | (options.renderer == 3));
     end
 
     % Convert user dir '~' to full path
@@ -1011,7 +1084,7 @@ function [fig, options] = parse_args(nout, fig, varargin)
             pbar = get(hAx, 'PlotBoxAspectRatio');
             pos = min(pos(4), pbar(2)*pos(3)/pbar(1));
             % Set the magnification to give native resolution
-            options.magnify = (height * diff(yl2)) / (pos * diff(yl));
+            options.magnify = abs((height * diff(yl2)) / (pos * diff(yl)));  % magnification must never be negative: issue #103
             break
         end
     end

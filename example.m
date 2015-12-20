@@ -1,7 +1,7 @@
-%% toPPT-2.2:
+%% toPPT-2.3:
 % * Author :  Jens Richter
 % * eMail  :  jrichter@iph.rwth-aachen.de
-% * Date   :  19th of June 2015
+% * Date   :  21th of December 2015
 
 
 %% Adds all files of toPPT to matlab path
@@ -12,6 +12,12 @@ addpath(genpath(pathstr1));
 % Drive into toPPT folder.
 cd(pathstr1);
 clear pathstr1 fullpath;
+
+%% Latest release notes (20 December 2015):
+% * Using Github
+% * Updated exportFig version (20.12.2015)
+% * CSS-Tags are working in captions
+% * Abbility of using frames arround textBoxes
 
 %% Latest release notes (19 June 2015):
 % * Optional use of inbuild matlab export functions => faster, smaller
@@ -228,8 +234,8 @@ toPPT('setTitle','Example 4b - Adding multiple texts with a bullet point to a ne
 %% Example 4c - Applying bold, underlined and italic to text elements (css-tags):
 % We want to make some parts of our texts underlined, italic or/and bold.
 
-toPPT({'<b>Bold</b>','<b><u>Bold and underlined</u></b> meets <i>Italic</i>','Normal'},'SlideNumber','append');
-toPPT('setTitle','Example 4c - Applying bold, underlined and italic to text elements (css-tags)');
+toPPT({'<i>Bold</i>','<b><u>Bold and underlined</u></b> meets <i>Italic</i>','Normal'},'SlideNumber','append');
+toPPT('setTitle','<b>Example 4c</b> - Applying bold, underlined and italic to text elements <s color:red><i>(css-tags)</i></s>');
 
 %% Example 4d - Changing the color, size and font of text elements (css-tags):
 % We want to assign another color, different size and a different font to
@@ -246,6 +252,8 @@ toPPT('setTitle','Example 4d - Changing the color, size and font of text element
 toPPT({'<s color:green; font-size:36; font-family:Aharoni>Mixed One</s>','<i><u><b><s font-family:Times New Roman>Bold, underlined,italic and Times</s></b></u></i>'},...
     'SlideNumber','append');
 toPPT('setTitle','Example 4e - Changing color, size and font and apply bold, underlined and italic');
+
+toPPT({'<s color:red; font-size:36;>Draw a frame</s> around me'},'hasFrame',1,'frameType','DashDotDot','frameColor','blue','rotationAngle',10,'frameWidth',6,'pos','SE');
 
 %% Example 4f -  Using Hex-Code for defining the color of a text element:
 % Now we want to use hex colors - *it is important to use a leading '#' in front of
