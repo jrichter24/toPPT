@@ -27,6 +27,7 @@ function desiredProperty = toPPT_conifg(identifierProperty)
     toPPTFigure.defaultExportFormatType  = 'meta';                          %% User can change value => toPPTFigure.allowedExportFormatType
     toPPTFigure.allowedExportFormatType    = {'jpeg','png','tiff','tiffn','meta','bmpmono','bmp','bmp16m','bmp256','hdf','pbm','pbmraw','pcxmono','pcx24b','pcx256','pcx16','pgm','pgmraw','ppm','ppmraw','clipboard'};
     toPPTFigure.allowedExportFormatTypeExt = {'.jpg','.png','.tif','.tif','.emf','.bmp','.bmp','.bmp','.bmp','.hdf','.pbm','.pbm','.pcx','.pcx','.pcx','.pcx','.pgm','.pgm','.ppm','.ppm',''};
+    toPPTFigure.cleanUpTempImages          = 1;                             %% User can change value (If set to one temp Images will be deleted after inserting into ppt. If zero last image will be kept)
         
     % Additional for figures in png format
     toPPTFigurePNG                       = toPPTFigure;

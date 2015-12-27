@@ -179,6 +179,16 @@ left   = postioningParameters.left;
 if ~doClipboardExport
     img = invoke(slide.Shapes,'AddPicture',imagePath,'msoFalse','msoTrue',left,top,width,height);
     invoke(img,'ZOrder','msoSendToBack');
+    
+    %% Clean up imagepath
+    if myArg.cleanUpTempImages
+        try
+            delete(imagePath);
+        catch
+            warning('Cleaning up temp data failed.');
+        end
+    end
+    
 else
     img = invoke(slide.Shapes,'PasteSpecial');
     lastIndex = slide.Shapes.Range.Count;

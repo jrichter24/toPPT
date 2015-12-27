@@ -1138,7 +1138,7 @@ function myArg = getValuesFromArgument(myArg,arguments,out)
             arguments              = structMyArgument.arguments;
         end
         %%%
-
+        
 
     end
     
