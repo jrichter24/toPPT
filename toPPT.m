@@ -69,6 +69,15 @@
 %   toPPT('existingFigure','C:\myFig.fig');
 %
 %
+% Parameter 'existingImage':
+% ---------------
+%   Loads an exiting image. Can be combined with all other commands. The 
+%   path can be defined relative or absolute.
+%
+%   Example:
+%   toPPT('existingFigure','C:\myFig.png');
+%
+%
 % Input 'Your Text String':
 % ---------------
 %   toPPT('My text') - adds your text as bullet point.
@@ -576,6 +585,15 @@ if ~isempty(structMyArgument.value)
     varargin            = structMyArgument.arguments;
 end
 
+asExistingImage = 0; % By default we do not want to load an existing figure
+
+structMyArgument         = deleteFromArgumentAndGetValue(varargin,'existingImage');
+if ~isempty(structMyArgument.value)
+    imagePath2Load      = structMyArgument.value;
+    asExistingImage     = 1;
+    varargin            = structMyArgument.arguments;
+end
+
 if textAsQRCode
     %if strcmp(version('-release'),'2014b') || strcmp(version('-release'),'2014a')
     if matlabVersionChecker('2014a')
@@ -743,6 +761,33 @@ if asExistingFigure
             warning(['An error occured loading: ',figurePath2Load,'. The file is existing but can not be opened?!']);
         else
             warning(['An error occured loading: ',figurePath2Load,'. The file is not existing or not readable -  Right path? An active presentation will be used instead. If there is no active presentation a new one will be created.']);
+        end
+    end
+    
+end
+
+
+if asExistingImage
+    
+    try
+        % Load figure
+        c = imread(imagePath2Load);
+        
+        figureExistingImage = figure;
+        imagesc(c);
+        axis off;
+        axis equal;
+        varargin{1} = figureExistingImage;
+        
+    catch
+        
+        % Check if figure is existing
+        isExistingFigure = isequal(exist(imagePath2Load),2);
+        
+        if isExistingFigure
+            warning(['An error occured loading: ',imagePath2Load,'. The file is existing but can not be opened?!']);
+        else
+            warning(['An error occured loading: ',imagePath2Load,'. The file is not existing or not readable -  Right path? An active presentation will be used instead. If there is no active presentation a new one will be created.']);
         end
     end
     
