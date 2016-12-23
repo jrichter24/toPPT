@@ -1,5 +1,8 @@
 # toPPT
-toPPT is a powerful tool for generating PowerPoint presentations programmatically defined in Matlab. It will use different scripts for performing exports of figures, tables and texts. For this purpose it will use scripts written by Jens Richter and in addition scripts written by others (see Acknowledgment) .  All code was tested with Matlab 2012-2015 and PowerPoint 2010 and 2013
+toPPT is a powerful tool for generating PowerPoint presentations programmatically defined in Matlab. It will use different scripts for performing exports of figures, tables and texts. For this purpose it will use scripts written by Jens Richter and in addition scripts written by others (see Acknowledgment) .  All code was tested with Matlab 2012-2016 and PowerPoint 2013 and 2016
+
+# If you like what you see:
+<a href='https://ko-fi.com/A437HBY' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi4.png?v=f' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a> 
 
 # Example.m Content...
 
