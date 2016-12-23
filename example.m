@@ -1,7 +1,7 @@
-%% toPPT-2.3:
+%% toPPT-2.5:
 % * Author :  Jens Richter
 % * eMail  :  jrichter@iph.rwth-aachen.de
-% * Date   :  21th of December 2015
+% * Date   :  23th of December 2016
 
 
 %% Adds all files of toPPT to matlab path
@@ -182,6 +182,16 @@ figPath = [pwd,'\testLoadMe.fig'];
 toPPT('existingFigure',figPath); % By default a new slide is created when adding a figure
 
 toPPT('setTitle','Example 3d - Adding an existing figure');
+
+
+%% Example 3d2 - Adding an existing image:
+% The challenge is to load an existing image and add it to our
+% presentation. The path can be defined relative or absolute.
+
+figPath = [pwd,'\luke.jpg'];
+toPPT('existingImage',figPath); % By default a new slide is created when adding a figure
+
+toPPT('setTitle','Example 3d-2 - Adding an existing image');
 
 
 %% Example 3e  - Changing the padding/gap of the active placing area of the slide:
@@ -652,6 +662,18 @@ toPPT('setTitle','Example 10 - Loading an existing presentation');
 
 toPPT('Closing a presentation is done via the syntax <b>toPPT(''close'',1)</b>','SlideNumber','append');
 toPPT('setTitle','Example 21 - Closing a presentation');
+
+
+%% Example 22 - If you like get me a coffee:
+figPath = [pwd,'\coffee.jpg'];
+toPPT('existingImage',figPath); % By default a new slide is created when adding a figure
+toPPT('<b><i><s font-family:Times New Roman;color:blue;font-size:20>If you like what you see buy me a coffee via:<\s><\i><\b>',...
+    'setBullets',0,'Width%',25,'pos%',[1,50],'posAnker','NW');
+
+toPPT('<b><i><s font-family:Times New Roman;color:blue;font-size:20> https://ko-fi.com/A437HBY<\s><\i><\b>',...
+    'setBullets',0,'Width%',40,'pos%',[1,70],'posAnker','NW');
+
+toPPT('setTitle','If you like - Get me a coffee');
 
 %% Done with the example. Let’s close all generated figures.
 close all;

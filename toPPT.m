@@ -1,4 +1,4 @@
-% toPPT-2.2 by Jens Richter 
+% toPPT-2.5 by Jens Richter 
 % email: jrichter@iph.rwth-aachen.de
 %
 % The following help describes the parameters in the order they appear in
