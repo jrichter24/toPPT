@@ -13,6 +13,11 @@ addpath(genpath(pathstr1));
 cd(pathstr1);
 clear pathstr1 fullpath;
 
+%% Latest release notes (04 January 2017):
+% * Updated Readme
+% * Loading existing images
+% * Cleanup of temp images
+
 %% Latest release notes (20 December 2015):
 % * Using Github
 % * Updated exportFig version (20.12.2015)
